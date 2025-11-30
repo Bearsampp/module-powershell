@@ -46,13 +46,19 @@ gradlew release
 ```
 
 **Process**:
-1. Validates version exists in `bin/` or `bin/archived/`
-2. Downloads module from modules-untouched repository
-3. Processes dependencies from `deps.properties`
-4. Prepares files in temporary directory
-5. Creates compressed archive (.7z or .zip)
-6. Generates hash files (MD5, SHA1, SHA256, SHA512)
-7. Outputs to build directory
+1. **Auto-clean**: Removes all temporary build artifacts (preserves `bundles_build`)
+2. Validates version exists in `bin/` or `bin/archived/`
+3. Downloads module from modules-untouched repository (always fresh, no cache)
+4. Processes dependencies from `deps.properties` (always fresh, no cache)
+5. Prepares files in temporary directory
+6. Creates compressed archive (.7z or .zip)
+7. Generates hash files (MD5, SHA1, SHA256, SHA512)
+8. Outputs to build directory and `bundles_build` (uncompressed)
+
+**Important Notes**:
+- **No Caching**: All downloads are fetched fresh to avoid stale files
+- **Auto-Clean**: Build artifacts are automatically cleaned before each build
+- **Development Build**: Uncompressed version saved to `bundles_build` for testing
 
 **Output Location**:
 ```
@@ -97,7 +103,7 @@ gradlew releaseAll
 
 ### clean
 
-Clean build artifacts and temporary files.
+Clean build artifacts and temporary files while preserving development builds.
 
 **Group**: `build`
 
@@ -119,8 +125,17 @@ gradlew clean release -PbundleVersion=7.5.4
 
 **Removes**:
 - `build/` directory (Gradle build output)
-- Temporary build directory (system temp)
-- Downloaded dependency caches
+- `tmp/bundles_prep/` (temporary preparation files)
+- `tmp/bundles_src/` (temporary source files)
+- `tmp/downloads/` (downloaded dependency archives)
+- `tmp/extract/` (extracted dependency files)
+- `tmp/untouched/` (modules-untouched temporary files)
+- `tmp/*-temp/` (temporary extraction directories)
+
+**Preserves**:
+- `tmp/bundles_build/` (non-archived development builds)
+
+**Note**: The `bundles_build` directory contains uncompressed builds useful for development and testing. These are intentionally preserved during clean operations.
 
 ---
 
@@ -566,9 +581,10 @@ Use build cache for faster builds (already enabled):
 
 ### Offline Mode
 
-Build without network access (uses cached dependencies):
+**Note**: Offline mode is not recommended for this module as all dependencies are downloaded fresh (no caching) to ensure the latest versions are used.
 
 ```powershell
+# Not recommended - will fail if files need to be downloaded
 gradlew release -PbundleVersion=7.5.4 --offline
 ```
 

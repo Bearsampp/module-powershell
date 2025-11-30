@@ -147,6 +147,7 @@ def find7ZipExecutable() {
 
 /**
  * Download a file from URL with progress indication
+ * Always downloads fresh - no caching to avoid stale files
  */
 def downloadFile(String url, File destFile) {
     println "  Downloading from: ${url}"
@@ -154,8 +155,15 @@ def downloadFile(String url, File destFile) {
 
     destFile.parentFile.mkdirs()
 
+    // Delete existing file to force fresh download
+    if (destFile.exists()) {
+        println "  Removing cached file to force fresh download"
+        destFile.delete()
+    }
+
     def connection = new URL(url).openConnection()
     connection.setRequestProperty('User-Agent', 'Bearsampp-Build')
+    connection.setUseCaches(false) // Disable HTTP caching
 
     def contentLength = connection.getContentLengthLong()
     def inputStream = connection.getInputStream()
@@ -187,6 +195,7 @@ def downloadFile(String url, File destFile) {
 
 /**
  * Download and extract a dependency from URL
+ * Always downloads fresh - no caching to avoid stale files
  */
 def downloadAndExtract(String url, File destDir) {
     // Use shared downloads cache directory
@@ -197,12 +206,9 @@ def downloadAndExtract(String url, File destDir) {
     def filename = url.substring(url.lastIndexOf('/') + 1)
     def destFile = file("${downloadsDir}/${filename}")
 
-    // Download if not already cached
-    if (!destFile.exists()) {
-        downloadFile(url, destFile)
-    } else {
-        println "  Using cached file: ${destFile.name}"
-    }
+    // Always download fresh - no caching
+    println "  Downloading fresh copy (no cache)"
+    downloadFile(url, destFile)
 
     // Extract the archive
     println "  Extracting to: ${destDir.absolutePath}"
@@ -312,7 +318,7 @@ def downloadFromModulesUntouched(String name, String version) {
         println "  Constructed fallback URL (verify manually if needed):\n  ${url}"
     }
 
-    println "Downloading ${name} ${version}..."
+    println "Downloading ${name} ${version} (no cache)..."
 
     // Create shared download cache directory under bearsampp-build/tmp
     def downloadsDir = file(bundleTmpDownloadPath)
@@ -324,19 +330,16 @@ def downloadFromModulesUntouched(String name, String version) {
 
     // Determine filename from URL
     def filename = url.substring(url.lastIndexOf('/') + 1)
-    // Cache downloads in a stable location
     def destFile = file("${downloadsDir}/${filename}")
 
-    // Download if not cached
-    if (!destFile.exists()) {
-        downloadFile(url, destFile)
-    } else {
-        println "Using cached file: ${destFile.name}"
-    }
+    // Always download fresh - no caching
+    println "Downloading fresh copy (no cache)"
+    downloadFile(url, destFile)
 
     // Extract to shared extract directory: bearsampp-build/tmp/extract/{bundleName}/{version}
     def extractDir = file("${bundleTmpExtractPath}/${version}")
     if (extractDir.exists()) {
+        println "Removing cached extraction directory"
         delete extractDir
     }
     extractDir.mkdirs()
@@ -432,6 +435,32 @@ tasks.register('release') {
 
     // Capture property at configuration time to avoid deprecation warning
     def bundleVersionProperty = project.findProperty('bundleVersion')
+
+    doFirst {
+        // Clean build artifacts before starting
+        println ""
+        println "=".multiply(70)
+        println "Cleaning build artifacts before build..."
+        println "=".multiply(70)
+        println ""
+
+        // Clean Gradle build directory
+        def buildDir = file("${projectDir}/build")
+        if (buildDir.exists()) {
+            delete buildDir
+            println "Cleaned: ${buildDir}"
+        }
+
+        // Clean temp build directory
+        if (bundleTmpPath.exists()) {
+            delete bundleTmpPath
+            println "Cleaned: ${bundleTmpPath}"
+        }
+
+        println ""
+        println "[SUCCESS] Build artifacts cleaned"
+        println ""
+    }
 
     doLast {
         def versionToBuild = bundleVersionProperty
@@ -553,9 +582,10 @@ tasks.register('release') {
         println ""
 
         try {
-            // Always download fresh from modules-untouched (no cache)
+            // Always download fresh from modules-untouched
             def tmpExtractPath = file("${bundleTmpExtractPath}/${bundleVersion}")
             if (tmpExtractPath.exists()) {
+                println "  Removing cached extraction directory"
                 delete tmpExtractPath
             }
 
@@ -625,20 +655,16 @@ tasks.register('release') {
                 def filename = ohMyPoshUrl.substring(ohMyPoshUrl.lastIndexOf('/') + 1)
                 def finalDestFile = file("${ohMyPoshPath}/${filename}")
 
-                // Download if not already cached
+                // Always download fresh
                 def downloadsDir = file(bundleTmpDownloadPath)
                 downloadsDir.mkdirs()
-                def cachedFile = file("${downloadsDir}/${filename}")
+                def downloadedFile = file("${downloadsDir}/${filename}")
 
-                if (!cachedFile.exists()) {
-                    downloadFile(ohMyPoshUrl, cachedFile)
-                } else {
-                    println "  Using cached file: ${cachedFile.name}"
-                }
+                downloadFile(ohMyPoshUrl, downloadedFile)
 
                 // Copy to destination keeping original filename
                 copy {
-                    from cachedFile
+                    from downloadedFile
                     into ohMyPoshPath
                 }
 
@@ -662,20 +688,16 @@ tasks.register('release') {
                 def filename = ohMyPoshThemeUrl.substring(ohMyPoshThemeUrl.lastIndexOf('/') + 1)
                 def destFile = file("${ohMyPoshThemePath}/${filename}")
 
-                // Download if not already cached
+                // Always download fresh
                 def downloadsDir = file(bundleTmpDownloadPath)
                 downloadsDir.mkdirs()
-                def cachedFile = file("${downloadsDir}/${filename}")
+                def downloadedFile = file("${downloadsDir}/${filename}")
 
-                if (!cachedFile.exists()) {
-                    downloadFile(ohMyPoshThemeUrl, cachedFile)
-                } else {
-                    println "  Using cached file: ${cachedFile.name}"
-                }
+                downloadFile(ohMyPoshThemeUrl, downloadedFile)
 
                 // Copy to destination
                 copy {
-                    from cachedFile
+                    from downloadedFile
                     into ohMyPoshThemePath
                 }
 
@@ -1003,21 +1025,44 @@ tasks.register('releaseAll') {
 // Task: Enhanced clean task
 tasks.named('clean') {
     group = 'build'
-    description = 'Clean build artifacts and temporary files'
+    description = 'Clean build artifacts and temporary files (preserves bundles_build)'
 
     doLast {
         // Clean Gradle build directory
         def buildDir = file("${projectDir}/build")
         if (buildDir.exists()) {
             delete buildDir
+            println "Cleaned: ${buildDir}"
         }
 
-        // Clean temp build directory
+        // Clean temp directories but preserve bundles_build
         if (bundleTmpPath.exists()) {
-            delete bundleTmpPath
+            println "Cleaning tmp directories (preserving bundles_build)..."
+            
+            // List of directories to clean (excluding bundles_build)
+            def dirsToClean = [
+                file("${buildTmpPath}/bundles_prep"),
+                file("${buildTmpPath}/bundles_src"),
+                file("${buildTmpPath}/downloads"),
+                file("${buildTmpPath}/extract"),
+                file("${buildTmpPath}/untouched"),
+                file("${buildTmpPath}/ansicon-temp"),
+                file("${buildTmpPath}/gnuwin32-bin-temp"),
+                file("${buildTmpPath}/gnuwin32-dep-temp")
+            ]
+            
+            dirsToClean.each { dir ->
+                if (dir.exists()) {
+                    delete dir
+                    println "  Cleaned: ${dir}"
+                }
+            }
+            
+            println "  Preserved: ${buildTmpPath}/bundles_build"
         }
 
-        println "[SUCCESS] Build artifacts cleaned"
+        println ""
+        println "[SUCCESS] Build artifacts cleaned (bundles_build preserved)"
     }
 }
 
