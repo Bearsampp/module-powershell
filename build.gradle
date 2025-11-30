@@ -244,7 +244,7 @@ def downloadAndExtract(String url, File destDir) {
 }
 
 /**
- * PRIMARY source of versions/URLs: modules-untouched consolez.properties
+ * PRIMARY source of versions/URLs: modules-untouched shell.properties
  * Fallbacks: local releases.properties, then constructed standard URL
  */
 def fetchModulesUntouchedProperties() {
@@ -369,24 +369,8 @@ def downloadFromModulesUntouched(String name, String version) {
         ant.unzip(src: destFile, dest: extractDir, overwrite: true)
     }
 
-    // Try to locate main Console.exe directory inside extracted tree
-    return findConsolezDirectory(extractDir) ?: extractDir
-}
-
-// Find ConsoleZ directory containing Console.exe
-def findConsolezDirectory(File extractPath) {
-    def hasExe = { File dir -> new File(dir, 'Console.exe').exists() }
-    if (!extractPath?.exists()) return null
-    if (hasExe(extractPath)) return extractPath
-    File found = null
-    def stack = new ArrayDeque<File>()
-    extractPath.listFiles()?.findAll { it.isDirectory() }?.each { stack.push(it) }
-    while (!stack.isEmpty() && found == null) {
-        def dir = stack.pop()
-        if (hasExe(dir)) { found = dir; break }
-        dir.listFiles()?.findAll { it.isDirectory() }?.each { stack.push(it) }
-    }
-    return found
+    // For shell module, the extracted directory is the PowerShell root
+    return extractDir
 }
 
 // ============================================================================
@@ -1095,7 +1079,7 @@ tasks.register('verify') {
     description = 'Verify build environment and dependencies'
 
     doLast {
-        println "Verifying build environment for module-consolez..."
+        println "Verifying build environment for module-shell..."
 
         def checks = [:]
 
@@ -1302,10 +1286,10 @@ tasks.register('validateProperties') {
     }
 }
 
-// Task: Check ConsoleZ dependencies configuration
+// Task: Check Shell dependencies configuration
 tasks.register('checkDeps') {
     group = 'verification'
-    description = 'Check ConsoleZ dependencies configuration in bin directories'
+    description = 'Check Shell dependencies configuration in bin directories'
 
     doLast {
         def binDir = file("${projectDir}/bin")
@@ -1314,7 +1298,7 @@ tasks.register('checkDeps') {
             return
         }
 
-        println "\nChecking ConsoleZ dependencies configuration..."
+        println "\nChecking Shell dependencies configuration..."
         println "-".multiply(80)
 
         def versions = binDir.listFiles()

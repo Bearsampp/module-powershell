@@ -1,8 +1,8 @@
 /*
- * Bearsampp Module ConsoleZ - Gradle Settings
+ * Bearsampp Module Shell - Gradle Settings
  */
 
-rootProject.name = 'module-consolez'
+rootProject.name = 'module-shell'
 
 // Enable Gradle features for better performance
 enableFeaturePreview('STABLE_CONFIGURATION_CACHE')
@@ -19,7 +19,7 @@ buildCache {
 gradle.rootProject {
     println """
     ================================================================
-      Initializing Bearsampp Module ConsoleZ Build
+      Initializing Bearsampp Module Shell Build
     ================================================================
     """.stripIndent()
 }
