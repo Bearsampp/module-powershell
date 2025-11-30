@@ -609,57 +609,7 @@ tasks.register('release') {
                 println "Verified: ansicon.exe"
             }
 
-            // Clink
-            if (depsProps.containsKey('clink')) {
-                println ""
-                println "Download Clink"
-                def clinkUrl = depsProps.getProperty('clink')
-                def clinkPath = file("${bundleSrcFinal}/vendor/clink")
-
-                def clinkTempDir = downloadAndExtract(clinkUrl, file("${bundleTmpPath}/clink-temp"))
-
-                // Extract basename from URL for subdirectory
-                def clinkBasename = clinkUrl.substring(clinkUrl.lastIndexOf('/') + 1).replace('.zip', '')
-
-                println "Check Clink"
-                clinkPath.mkdirs()
-                copy {
-                    from "${clinkTempDir}/${clinkBasename}"
-                    into clinkPath
-                }
-
-                def clinkBat = file("${clinkPath}/clink.bat")
-                if (!clinkBat.exists()) {
-                    throw new GradleException("clink.bat not found after extraction")
-                }
-                println "Verified: clink.bat"
-            }
-
-            // Clink completions
-            if (depsProps.containsKey('clink_completions')) {
-                println ""
-                println "Download Clink completions"
-                def clinkCompletionsUrl = depsProps.getProperty('clink_completions')
-                def clinkCompletionsPath = file("${bundleSrcFinal}/vendor/clink-completions")
-
-                def clinkCompletionsTempDir = downloadAndExtract(clinkCompletionsUrl, file("${bundleTmpPath}/clink-completions-temp"))
-
-                // Extract basename from URL for subdirectory
-                def clinkCompletionsBasename = clinkCompletionsUrl.substring(clinkCompletionsUrl.lastIndexOf('/') + 1).replace('.zip', '')
-
-                println "Check Clink completions"
-                clinkCompletionsPath.mkdirs()
-                copy {
-                    from "${clinkCompletionsTempDir}/${clinkCompletionsBasename}"
-                    into clinkCompletionsPath
-                }
-
-                def clinkInitLua = file("${clinkCompletionsPath}/.init.lua")
-                if (!clinkInitLua.exists()) {
-                    throw new GradleException(".init.lua not found after extraction")
-                }
-                println "Verified: .init.lua"
-            }
+            // Clink is not used in PowerShell module (removed)
 
             // Oh My Posh
             if (depsProps.containsKey('oh_my_posh')) {
@@ -904,8 +854,6 @@ tasks.register('release') {
         println "Cleaning temporary dependency folders..."
         def tempDirsToClean = [
             file("${buildTmpPath}/ansicon-temp"),
-            file("${buildTmpPath}/clink-temp"),
-            file("${buildTmpPath}/clink-completions-temp"),
             file("${buildTmpPath}/gnuwin32-bin-temp"),
             file("${buildTmpPath}/gnuwin32-dep-temp")
         ]
