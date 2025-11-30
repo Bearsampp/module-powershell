@@ -1,20 +1,25 @@
 <p align="center"><a href="https://bearsampp.com/contribute" target="_blank"><img width="250" src="img/Bearsampp-logo.svg"></a></p>
 
-[![GitHub release](https://img.shields.io/github/release/bearsampp/module-consolez.svg?style=flat-square)](https://github.com/bearsampp/module-consolez/releases/latest)
-![Total downloads](https://img.shields.io/github/downloads/bearsampp/module-consolez/total.svg?style=flat-square)
+[![GitHub release](https://img.shields.io/github/release/bearsampp/module-shell.svg?style=flat-square)](https://github.com/bearsampp/module-shell/releases/latest)
+![Total downloads](https://img.shields.io/github/downloads/bearsampp/module-shell/total.svg?style=flat-square)
 
-This is a module of [Bearsampp project](https://github.com/bearsampp/bearsampp) involving ConsoleZ, built with a pure Gradle build system.
+This is a module of [Bearsampp project](https://github.com/bearsampp/bearsampp) involving PowerShell with enhanced features, built with a pure Gradle build system.
 
 ---
 
 ## Overview
 
-ConsoleZ is an enhanced console window for Windows featuring tabs, text editor-like text selection, and various customization options. This module provides automated building and packaging for Bearsampp.
+This module provides PowerShell 7+ with enhanced console features including:
+- **Clink** - Powerful command-line completion and editing
+- **Clink-completions** - Extended completion scripts for common commands
+- **Oh My Posh** - Beautiful and customizable prompt themes
+
+This module provides automated building and packaging for Bearsampp.
 
 ### Build System
 
 - **Pure Gradle Build**: Modern build automation with no Ant dependencies
-- **Automated Downloads**: Fetches ConsoleZ and dependencies from modules-untouched repository
+- **Automated Downloads**: Fetches PowerShell and dependencies from modules-untouched repository
 - **Multi-Version Support**: Build single or multiple versions simultaneously
 - **Hash Generation**: Automatically generates MD5, SHA1, SHA256, and SHA512 checksums
 
@@ -34,7 +39,7 @@ ConsoleZ is an enhanced console window for Windows featuring tabs, text editor-l
 
 ```powershell
 # Build a specific version
-gradle release -PbundleVersion=1.19.0.19104
+gradle release -PbundleVersion=7.5.4
 
 # Build all available versions
 gradle releaseAll
@@ -67,14 +72,16 @@ Comprehensive documentation is available in the `.gradle-docs/` directory:
 ## Project Structure
 
 ```
-module-consolez/
+module-shell/
 ├── .gradle-docs/                 # Build documentation
 │   ├── README.md                 # Main documentation
 │   ├── TASKS.md                  # Task reference
 │   ├── CONFIGURATION.md          # Configuration guide
 │   └── TROUBLESHOOTING.md        # Troubleshooting guide
-├── bin/                          # ConsoleZ version directories
-│   └── consolez{version}/        # Version-specific files
+├── bin/                          # Shell version directories
+│   └── shell{version}/           # Version-specific files
+│       ├── deps.properties       # Dependencies configuration
+│       └── bearsampp.conf        # Bearsampp configuration
 ├── build.gradle                  # Main Gradle build script
 ├── build.properties              # Bundle configuration
 ├── gradle.properties             # Gradle runtime configuration
@@ -91,11 +98,22 @@ module-consolez/
 Core build configuration:
 
 ```properties
-bundle.name     = consolez        # Module name
-bundle.release  = r1              # Release identifier
+bundle.name     = shell           # Module name
+bundle.release  = 2025.11.13      # Release identifier
 bundle.type     = tools           # Bundle category
 bundle.format   = 7z              # Archive format (7z or zip)
 #build.path     = C:/Bearsampp-build  # Optional: custom output path
+```
+
+### deps.properties
+
+Dependencies configuration for each version (located in `bin/shell{version}/deps.properties`):
+
+```properties
+clink = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/clink.1.9.2.6aa2e0.zip
+clink_completions = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/clink-completions-0.6.7.zip
+oh_my_posh = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/posh-windows-amd64.exe
+oh_my_posh_theme = https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/paradox.omp.json
 ```
 
 ### Available Tasks
@@ -107,7 +125,8 @@ bundle.format   = 7z              # Archive format (7z or zip)
 | `clean`                       | Clean build artifacts and temporary files                      |
 | `verify`                      | Verify build environment and dependencies                      |
 | `listVersions`                | List available bundle versions                                 |
-| `listReleases`                | List releases from releases.properties                         |
+| `listReleases`                | List releases from modules-untouched                           |
+| `checkDeps`                   | Check dependencies configuration                               |
 | `info`                        | Display build information                                      |
 
 ---
@@ -118,7 +137,7 @@ bundle.format   = 7z              # Archive format (7z or zip)
 
 ```powershell
 # Non-interactive mode
-gradle release -PbundleVersion=1.19.0.19104
+gradle release -PbundleVersion=7.5.4
 
 # Interactive mode (prompts for version selection)
 gradle release
@@ -142,7 +161,6 @@ Environment Check Results:
 ------------------------------------------------------------
   [PASS]     Java 8+
   [PASS]     build.properties
-  [PASS]     releases.properties
   [PASS]     dev directory
   [PASS]     bin directory
   [PASS]     7-Zip
@@ -160,21 +178,39 @@ Build artifacts are organized as follows:
 ```
 C:/Bearsampp-build/
 └── tools/
-    └── consolez/
-        └── r1/
-            ├── bearsampp-consolez-1.19.0.19104-r1.7z
-            ├── bearsampp-consolez-1.19.0.19104-r1.7z.md5
-            ├── bearsampp-consolez-1.19.0.19104-r1.7z.sha1
-            ├── bearsampp-consolez-1.19.0.19104-r1.7z.sha256
-            └── bearsampp-consolez-1.19.0.19104-r1.7z.sha512
+    └── shell/
+        └── 2025.11.13/
+            ├── bearsampp-shell-7.5.4-2025.11.13.7z
+            ├── bearsampp-shell-7.5.4-2025.11.13.7z.md5
+            ├── bearsampp-shell-7.5.4-2025.11.13.7z.sha1
+            ├── bearsampp-shell-7.5.4-2025.11.13.7z.sha256
+            └── bearsampp-shell-7.5.4-2025.11.13.7z.sha512
 ```
+
+---
+
+## Features
+
+### Enhanced Console Features
+
+- **Clink Integration**: Powerful bash-style command-line editing
+- **Auto-completion**: Intelligent command and path completion
+- **Oh My Posh Themes**: Beautiful, customizable prompt themes
+- **Command History**: Persistent command history across sessions
+
+### Build Features
+
+- **Dependency Management**: Automatic download and integration of dependencies
+- **Version Control**: Support for multiple PowerShell versions
+- **Automated Packaging**: Creates distribution-ready archives with checksums
+- **Caching**: Downloads are cached to speed up subsequent builds
 
 ---
 
 ## Documentation and Downloads
 
-- **Official Website**: https://bearsampp.com/module/consolez
-- **GitHub Repository**: https://github.com/bearsampp/module-consolez
+- **Official Website**: https://bearsampp.com/module/shell
+- **GitHub Repository**: https://github.com/bearsampp/module-shell
 - **Build Documentation**: [.gradle-docs/README.md](.gradle-docs/README.md)
 
 ---

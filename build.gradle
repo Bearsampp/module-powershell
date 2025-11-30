@@ -1,5 +1,5 @@
 /*
- * Bearsampp Module ConsoleZ - Gradle Build Script
+ * Bearsampp Module Shell - Gradle Build Script
  * 
  * This build script converts the Ant-based build process to Gradle while maintaining
  * all features, tasks, methods, and functions from the original build.xml.
@@ -29,7 +29,7 @@ def buildProps = new Properties()
 buildPropsFile.withInputStream { buildProps.load(it) }
 
 // Bundle configuration from build.properties
-ext.bundleName = buildProps.getProperty('bundle.name', 'consolez')
+ext.bundleName = buildProps.getProperty('bundle.name', 'shell')
 ext.bundleRelease = buildProps.getProperty('bundle.release', 'r1')
 ext.bundleType = buildProps.getProperty('bundle.type', 'tools')
 ext.bundleFormat = buildProps.getProperty('bundle.format', '7z')
@@ -401,7 +401,7 @@ tasks.register('info') {
     doLast {
         println """
         ================================================================
-          Bearsampp Module ConsoleZ - Build Information
+          Bearsampp Module Shell - Build Information
         ================================================================
         
         Bundle Configuration:
@@ -672,6 +672,80 @@ tasks.register('release') {
                     throw new GradleException(".init.lua not found after extraction")
                 }
                 println "Verified: .init.lua"
+            }
+            
+            // Oh My Posh
+            if (depsProps.containsKey('oh_my_posh')) {
+                println ""
+                println "Download Oh My Posh"
+                def ohMyPoshUrl = depsProps.getProperty('oh_my_posh')
+                def ohMyPoshPath = file("${bundleSrcFinal}/vendor/oh-my-posh")
+                
+                println "Check Oh My Posh"
+                ohMyPoshPath.mkdirs()
+                
+                // Determine filename from URL
+                def filename = ohMyPoshUrl.substring(ohMyPoshUrl.lastIndexOf('/') + 1)
+                def destFile = file("${ohMyPoshPath}/${filename}")
+                
+                // Download if not already cached
+                def downloadsDir = file(bundleTmpDownloadPath)
+                downloadsDir.mkdirs()
+                def cachedFile = file("${downloadsDir}/${filename}")
+                
+                if (!cachedFile.exists()) {
+                    downloadFile(ohMyPoshUrl, cachedFile)
+                } else {
+                    println "  Using cached file: ${cachedFile.name}"
+                }
+                
+                // Copy to destination
+                copy {
+                    from cachedFile
+                    into ohMyPoshPath
+                }
+                
+                if (!destFile.exists()) {
+                    throw new GradleException("${filename} not found after download")
+                }
+                println "Verified: ${filename}"
+            }
+            
+            // Oh My Posh Theme
+            if (depsProps.containsKey('oh_my_posh_theme')) {
+                println ""
+                println "Download Oh My Posh Theme"
+                def ohMyPoshThemeUrl = depsProps.getProperty('oh_my_posh_theme')
+                def ohMyPoshThemePath = file("${bundleSrcFinal}/vendor/oh-my-posh/themes")
+                
+                println "Check Oh My Posh Theme"
+                ohMyPoshThemePath.mkdirs()
+                
+                // Determine filename from URL
+                def filename = ohMyPoshThemeUrl.substring(ohMyPoshThemeUrl.lastIndexOf('/') + 1)
+                def destFile = file("${ohMyPoshThemePath}/${filename}")
+                
+                // Download if not already cached
+                def downloadsDir = file(bundleTmpDownloadPath)
+                downloadsDir.mkdirs()
+                def cachedFile = file("${downloadsDir}/${filename}")
+                
+                if (!cachedFile.exists()) {
+                    downloadFile(ohMyPoshThemeUrl, cachedFile)
+                } else {
+                    println "  Using cached file: ${cachedFile.name}"
+                }
+                
+                // Copy to destination
+                copy {
+                    from cachedFile
+                    into ohMyPoshThemePath
+                }
+                
+                if (!destFile.exists()) {
+                    throw new GradleException("${filename} not found after download")
+                }
+                println "Verified: ${filename}"
             }
             
             // GnuWin32 CoreUtils bin
@@ -1289,7 +1363,7 @@ tasks.register('downloadConsoleZ') {
 gradle.taskGraph.whenReady { graph ->
     println """
     ================================================================
-      Bearsampp Module ConsoleZ - Gradle Build
+      Bearsampp Module Shell - Gradle Build
     ================================================================
     """.stripIndent()
 }

@@ -155,7 +155,7 @@ All tables in documentation have properly aligned columns:
 ```markdown
 | Task                          | Description                                                    | Example                                      |
 |-------------------------------|----------------------------------------------------------------|----------------------------------------------|
-| `release`                     | Build release for specific version                             | `gradlew release -PbundleVersion=1.19.0.19104` |
+| `release`                     | Build release for specific version                             | `gradlew release -PbundleVersion=7.5.4` |
 | `releaseAll`                  | Build all available versions                                   | `gradlew releaseAll`                         |
 | `clean`                       | Clean build artifacts and temporary files                      | `gradlew clean`                              |
 ```
@@ -192,7 +192,7 @@ All documents follow the same structure:
 
 ```xml
 <!-- build.xml -->
-<project name="module-consolez" basedir=".">
+<project name="module-shell" basedir=".">
   <property file="build.properties"/>
   <import file="${dev.path}/build/build-commons.xml"/>
   <import file="${dev.path}/build/build-bundle.xml"/>
@@ -223,7 +223,7 @@ tasks.register('release') {
 }
 ```
 
-**Command**: `gradlew release -PbundleVersion=1.19.0.19104`
+**Command**: `gradlew release -PbundleVersion=7.5.4`
 
 ---
 
@@ -310,9 +310,9 @@ All existing configuration files remain compatible:
 The directory structure remains the same:
 
 ```
-module-consolez/
+module-shell/
 ├── bin/                          # Same
-│   └── consolez{version}/        # Same
+│   └── shell{version}/        # Same
 ├── build.properties              # Same format
 ├── releases.properties           # Same format
 └── ...
@@ -325,9 +325,9 @@ Build output remains in the same location:
 ```
 C:/Bearsampp-build/
 └── tools/
-    └── consolez/
-        └── r1/
-            └── bearsampp-consolez-{version}-r1.7z
+    └── shell/
+        └── 2025.11.13/
+            └── bearsampp-shell-{version}-2025.11.13.7z
 ```
 
 ### ✅ Archive Format
@@ -449,7 +449,7 @@ gradlew verify
 
 ```powershell
 # Build a test release
-gradlew release -PbundleVersion=1.19.0.19104
+gradlew release -PbundleVersion=7.5.4
 ```
 
 ### 4. Update Scripts

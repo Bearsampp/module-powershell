@@ -1,6 +1,6 @@
 # Configuration Guide
 
-Comprehensive guide for configuring the Bearsampp Module ConsoleZ Gradle build system.
+Comprehensive guide for configuring the Bearsampp module Shell Gradle build system.
 
 ---
 
@@ -38,7 +38,7 @@ The build system uses multiple configuration files:
 ### File Location
 
 ```
-module-consolez/build.properties
+module-shell/build.properties
 ```
 
 ### Configuration Options
@@ -49,13 +49,13 @@ module-consolez/build.properties
 
 **Type**: String
 
-**Default**: `consolez`
+**Default**: `shell`
 
 **Valid Values**: Any non-empty string (lowercase recommended)
 
 **Example**:
 ```properties
-bundle.name = consolez
+bundle.name = shell
 ```
 
 **Usage**: Used in:
@@ -71,13 +71,13 @@ bundle.name = consolez
 
 **Type**: String
 
-**Default**: `r1`
+**Default**: `2025.11.13`
 
 **Valid Values**: Any non-empty string (format: r{number})
 
 **Example**:
 ```properties
-bundle.release = r1
+bundle.release = 2025.11.13
 bundle.release = r2
 bundle.release = r3-beta
 ```
@@ -180,11 +180,11 @@ build.path = ../build-output
 ### Complete Example
 
 ```properties
-# Bearsampp Module ConsoleZ - Build Configuration
+# Bearsampp module Shell - Build Configuration
 
 # Bundle identification
-bundle.name = consolez
-bundle.release = r1
+bundle.name = shell
+bundle.release = 2025.11.13
 bundle.type = tools
 
 # Archive format (7z or zip)
@@ -206,7 +206,7 @@ bundle.format = 7z
 ### File Location
 
 ```
-module-consolez/gradle.properties
+module-shell/gradle.properties
 ```
 
 ### Configuration Options
@@ -370,7 +370,7 @@ org.gradle.configureondemand=false
 ### Complete Example
 
 ```properties
-# Gradle Build Properties for Bearsampp Module ConsoleZ
+# Gradle Build Properties for Bearsampp module Shell
 
 # ============================================================================
 # GRADLE DAEMON
@@ -430,7 +430,7 @@ org.gradle.configureondemand=false
 ### File Location
 
 ```
-module-consolez/releases.properties
+module-shell/releases.properties
 ```
 
 ### Format
@@ -447,21 +447,21 @@ Maps version identifiers to download URLs:
 
 **Syntax**:
 ```properties
-1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
 ```
 
 **Components**:
 
 | Component | Description                                | Example                          |
 |-----------|--------------------------------------------|----------------------------------|
-| Version   | ConsoleZ version identifier                | 1.19.0.19104                     |
+| Version   | shell version identifier                | 7.5.4                     |
 | URL       | Download URL for the release               | https://github.com/...           |
 
 **Example**:
 ```properties
-# ConsoleZ Releases
-1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
-1.20.0.20000 = https://github.com/Bearsampp/module-consolez/releases/download/r2/bearsampp-consolez-1.20.0.20000-r2.7z
+# shell Releases
+7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
+1.20.0.20000 = https://github.com/Bearsampp/module-shell/releases/download/r2/bearsampp-shell-1.20.0.20000-r2.7z
 ```
 
 ---
@@ -476,7 +476,7 @@ Maps version identifiers to download URLs:
 
 **Example**:
 ```properties
-1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
 ```
 
 #### Direct URLs
@@ -492,7 +492,7 @@ Maps version identifiers to download URLs:
 ### File Location
 
 ```
-module-consolez/bin/consolez{version}/deps.properties
+module-shell/bin/shell{version}/deps.properties
 ```
 
 ### Format
@@ -598,7 +598,7 @@ gnuwin32_coreutils_dep=https://downloads.sourceforge.net/project/gnuwin32/coreut
 ### Complete Example
 
 ```properties
-# ConsoleZ Dependencies Configuration
+# shell Dependencies Configuration
 
 # ANSICON - ANSI color support
 ansicon=https://github.com/adoxa/ansicon/releases/download/v1.89/ansi189.zip
@@ -719,13 +719,13 @@ Set via command line:
 
 ```powershell
 # Quiet (errors only)
-gradlew release -PbundleVersion=1.19.0.19104 --quiet
+gradlew release -PbundleVersion=7.5.4 --quiet
 
 # Info level
-gradlew release -PbundleVersion=1.19.0.19104 --info
+gradlew release -PbundleVersion=7.5.4 --info
 
 # Debug level
-gradlew release -PbundleVersion=1.19.0.19104 --debug
+gradlew release -PbundleVersion=7.5.4 --debug
 ```
 
 ---

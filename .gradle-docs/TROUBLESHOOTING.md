@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions for the Bearsampp Module ConsoleZ Gradle build system.
+Common issues and solutions for the Bearsampp module Shell Gradle build system.
 
 ---
 
@@ -123,7 +123,7 @@ gradlew: command not found
 
 **Symptoms**:
 ```
-build.properties not found at: E:/Bearsampp-development/module-consolez/build.properties
+build.properties not found at: E:/Bearsampp-development/module-shell/build.properties
 ```
 
 **Cause**: Missing or misplaced build.properties file
@@ -139,12 +139,12 @@ build.properties not found at: E:/Bearsampp-development/module-consolez/build.pr
    ```powershell
    pwd
    ```
-   Should be: `E:/Bearsampp-development/module-consolez`
+   Should be: `E:/Bearsampp-development/module-shell`
 
 3. **Create build.properties** if missing:
    ```properties
-   bundle.name = consolez
-   bundle.release = r1
+   bundle.name = shell
+   bundle.release = 2025.11.13
    bundle.type = tools
    bundle.format = 7z
    ```
@@ -157,7 +157,7 @@ build.properties not found at: E:/Bearsampp-development/module-consolez/build.pr
 
 **Symptoms**:
 ```
-Bundle version not found: consolez1.19.0.19104
+Bundle version not found: shell7.5.4
 
 Available versions:
   (none found)
@@ -176,21 +176,21 @@ Available versions:
    ```powershell
    dir bin
    ```
-   Should contain: `consolez{version}/`
+   Should contain: `shell{version}/`
 
 3. **Verify directory naming**:
-   - Correct: `consolez1.19.0.19104`
-   - Incorrect: `ConsoleZ1.19.0.19104` (case matters)
-   - Incorrect: `consolez-1.19.0.19104` (no dash)
+   - Correct: `shell7.5.4`
+   - Incorrect: `shell7.5.4` (case matters)
+   - Incorrect: `shell-7.5.4` (no dash)
 
 4. **Create version directory**:
    ```powershell
-   mkdir bin\consolez1.19.0.19104
+   mkdir bin\shell7.5.4
    ```
 
 5. **Download version**:
    ```powershell
-   gradlew downloadConsoleZ -PconsolezVersion=1.19.0.19104
+   gradlew downloadshell -PshellVersion=7.5.4
    ```
 
 ---
@@ -208,7 +208,7 @@ Console.exe not found in downloaded module
 
 1. **Verify releases.properties URL**:
    ```properties
-   1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+   7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
    ```
 
 2. **Check download integrity**:
@@ -218,14 +218,14 @@ Console.exe not found in downloaded module
 3. **Manual verification**:
    ```powershell
    # Extract archive manually
-   7z x bearsampp-consolez-1.19.0.19104-r1.7z
+   7z x bearsampp-shell-7.5.4-2025.11.13.7z
    # Check for Console.exe
    dir Console.exe
    ```
 
 4. **Check extraction path**:
    - Module might be in nested directory
-   - Look for `consolez{version}/Console.exe`
+   - Look for `shell{version}/Console.exe`
 
 ---
 
@@ -285,7 +285,7 @@ java.lang.OutOfMemoryError: Java heap space
 3. **Build one version at a time**:
    ```powershell
    # Instead of releaseAll
-   gradlew release -PbundleVersion=1.19.0.19104
+   gradlew release -PbundleVersion=7.5.4
    ```
 
 4. **Disable daemon** if memory is very limited:
@@ -352,7 +352,7 @@ Failed to extract dependency
 
 2. **Re-download dependency**:
    ```powershell
-   gradlew clean release -PbundleVersion=1.19.0.19104
+   gradlew clean release -PbundleVersion=7.5.4
    ```
 
 3. **Verify archive integrity**:
@@ -428,7 +428,7 @@ clink.bat not found after extraction
 
 5. **Run with debug output**:
    ```powershell
-   gradlew release -PbundleVersion=1.19.0.19104 --debug
+   gradlew release -PbundleVersion=7.5.4 --debug
    ```
 
 ---
@@ -446,12 +446,12 @@ Failed to generate hash files
 
 1. **Verify archive exists**:
    ```powershell
-   dir "C:\Bearsampp-build\tools\consolez\r1\*.7z"
+   dir "C:\Bearsampp-build\tools\shell\2025.11.13\*.7z"
    ```
 
 2. **Check file permissions**:
    ```powershell
-   icacls "C:\Bearsampp-build\tools\consolez\r1"
+   icacls "C:\Bearsampp-build\tools\shell\2025.11.13"
    ```
 
 3. **Manually generate hashes**:
@@ -641,7 +641,7 @@ The filename or extension is too long
 
 3. **Move project closer to root**:
    ```
-   C:/Projects/module-consolez
+   C:/Projects/module-shell
    ```
 
 ---
@@ -720,7 +720,7 @@ When reporting issues, include:
 
 5. **Full error output**:
    ```powershell
-   gradlew release -PbundleVersion=1.19.0.19104 --stacktrace > error.log 2>&1
+   gradlew release -PbundleVersion=7.5.4 --stacktrace > error.log 2>&1
    ```
 
 ---
@@ -730,7 +730,7 @@ When reporting issues, include:
 Run build with debug output:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --debug --stacktrace
+gradlew release -PbundleVersion=7.5.4 --debug --stacktrace
 ```
 
 ---
@@ -750,7 +750,7 @@ gradlew verify
 Try clean build:
 
 ```powershell
-gradlew clean release -PbundleVersion=1.19.0.19104
+gradlew clean release -PbundleVersion=7.5.4
 ```
 
 ---
@@ -784,7 +784,7 @@ When reporting bugs, include:
 Build fails when trying to create 7z archive
 
 ## Steps to Reproduce
-1. Run: gradlew release -PbundleVersion=1.19.0.19104
+1. Run: gradlew release -PbundleVersion=7.5.4
 2. Build proceeds normally until archive creation
 3. Fails with exit code 2
 
@@ -802,8 +802,8 @@ Build fails when trying to create 7z archive
 ## Configuration
 build.properties:
 ```properties
-bundle.name = consolez
-bundle.release = r1
+bundle.name = shell
+bundle.release = 2025.11.13
 bundle.type = tools
 bundle.format = 7z
 ```

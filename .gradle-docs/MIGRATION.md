@@ -18,7 +18,7 @@ Guide for migrating from Ant-based build to pure Gradle build system.
 
 ## Overview
 
-The Bearsampp Module ConsoleZ build system has been migrated from Apache Ant to Gradle, providing a modern, maintainable, and feature-rich build automation solution.
+The Bearsampp module Shell build system has been migrated from Apache Ant to Gradle, providing a modern, maintainable, and feature-rich build automation solution.
 
 ### Migration Summary
 
@@ -119,14 +119,14 @@ These files remain unchanged:
 
 ```properties
 # Before (Ant) - Same format
-bundle.name = consolez
-bundle.release = r1
+bundle.name = shell
+bundle.release = 2025.11.13
 bundle.type = tools
 bundle.format = 7z
 
 # After (Gradle) - Same format
-bundle.name = consolez
-bundle.release = r1
+bundle.name = shell
+bundle.release = 2025.11.13
 bundle.type = tools
 bundle.format = 7z
 ```
@@ -149,10 +149,10 @@ org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m
 
 ```properties
 # Before (Ant) - Same format
-1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
 
 # After (Gradle) - Same format
-1.19.0.19104 = https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+7.5.4 = https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
 ```
 
 ### deps.properties
@@ -177,7 +177,7 @@ clink=https://github.com/chrisant996/clink/releases/download/v1.5.3/clink-1.5.3.
 
 ```xml
 <!-- build.xml -->
-<project name="module-consolez" basedir=".">
+<project name="module-shell" basedir=".">
   <property file="build.properties"/>
   <import file="${dev.path}/build/build-commons.xml"/>
   <import file="${dev.path}/build/build-bundle.xml"/>
@@ -213,7 +213,7 @@ tasks.register('release') {
 
 **Execution**:
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104
+gradlew release -PbundleVersion=7.5.4
 ```
 
 ### Key Differences
@@ -290,9 +290,9 @@ All existing configuration files remain compatible:
 The directory structure remains the same:
 
 ```
-module-consolez/
+module-shell/
 ├── bin/                          # Same
-│   └── consolez{version}/        # Same
+│   └── shell{version}/        # Same
 ├── build.properties              # Same format
 ├── releases.properties           # Same format
 └── ...
@@ -305,9 +305,9 @@ Build output remains in the same location:
 ```
 C:/Bearsampp-build/
 └── tools/
-    └── consolez/
-        └── r1/
-            └── bearsampp-consolez-{version}-r1.7z
+    └── shell/
+        └── 2025.11.13/
+            └── bearsampp-shell-{version}-2025.11.13.7z
 ```
 
 ### Archive Format
@@ -356,7 +356,7 @@ Archives maintain the same format and structure:
 ant release.build
 
 # After
-gradlew release -PbundleVersion=1.19.0.19104
+gradlew release -PbundleVersion=7.5.4
 ```
 
 ### Issue: Missing build.xml
@@ -376,7 +376,7 @@ gradlew release -PbundleVersion=1.19.0.19104
 ant release.build
 
 # Gradle (explicit version parameter)
-gradlew release -PbundleVersion=1.19.0.19104
+gradlew release -PbundleVersion=7.5.4
 
 # Or use interactive mode
 gradlew release

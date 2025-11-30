@@ -1,6 +1,6 @@
 # Gradle Tasks Reference
 
-Complete reference for all available Gradle tasks in the Bearsampp Module ConsoleZ build system.
+Complete reference for all available Gradle tasks in the Bearsampp module Shell build system.
 
 ---
 
@@ -19,7 +19,7 @@ Complete reference for all available Gradle tasks in the Bearsampp Module Consol
 
 ### release
 
-Build a release package for a specific ConsoleZ version.
+Build a release package for a specific shell version.
 
 **Group**: `build`
 
@@ -32,14 +32,14 @@ gradlew release -PbundleVersion=<version>
 
 | Parameter       | Required | Description                                | Example          |
 |-----------------|----------|--------------------------------------------|------------------|
-| bundleVersion   | No*      | Version to build                           | 1.19.0.19104     |
+| bundleVersion   | No*      | Version to build                           | 7.5.4     |
 
 *If not provided, interactive mode will prompt for version selection.
 
 **Examples**:
 ```powershell
 # Build specific version (non-interactive)
-gradlew release -PbundleVersion=1.19.0.19104
+gradlew release -PbundleVersion=7.5.4
 
 # Build with interactive version selection
 gradlew release
@@ -59,7 +59,7 @@ gradlew release
 {build.path}/{bundle.type}/{bundle.name}/{bundle.release}/
 ```
 
-Default: `C:/Bearsampp-build/tools/consolez/r1/`
+Default: `C:/Bearsampp-build/tools/shell/2025.11.13/`
 
 ---
 
@@ -114,7 +114,7 @@ gradlew clean
 gradlew clean
 
 # Clean and rebuild
-gradlew clean release -PbundleVersion=1.19.0.19104
+gradlew clean release -PbundleVersion=7.5.4
 ```
 
 **Removes**:
@@ -124,27 +124,27 @@ gradlew clean release -PbundleVersion=1.19.0.19104
 
 ---
 
-### downloadConsoleZ
+### downloadshell
 
-Download ConsoleZ package directly from modules-untouched repository.
+Download shell package directly from modules-untouched repository.
 
 **Group**: `build`
 
 **Syntax**:
 ```powershell
-gradlew downloadConsoleZ -PconsolezVersion=<version>
+gradlew downloadshell -PshellVersion=<version>
 ```
 
 **Parameters**:
 
 | Parameter        | Required | Description                                | Example          |
 |------------------|----------|--------------------------------------------|------------------|
-| consolezVersion  | Yes      | ConsoleZ version to download               | 1.19.0.19104     |
+| shellVersion  | Yes      | shell version to download               | 7.5.4     |
 
 **Examples**:
 ```powershell
 # Download specific version
-gradlew downloadConsoleZ -PconsolezVersion=1.19.0.19104
+gradlew downloadshell -PshellVersion=7.5.4
 ```
 
 **Process**:
@@ -233,15 +233,15 @@ gradlew validateProperties
 | Property        | Required | Valid Values                               |
 |-----------------|----------|--------------------------------------------|
 | bundle.name     | Yes      | Non-empty string                           |
-| bundle.release  | Yes      | Non-empty string (e.g., r1, r2)            |
+| bundle.release  | Yes      | Non-empty string (e.g., 2025.11.13, r2)            |
 | bundle.type     | Yes      | Non-empty string (e.g., tools, apps)       |
 | bundle.format   | Yes      | 7z or zip                                  |
 
 **Output**:
 ```
 [SUCCESS] All required properties are present:
-    bundle.name = consolez
-    bundle.release = r1
+    bundle.name = shell
+    bundle.release = 2025.11.13
     bundle.type = tools
     bundle.format = 7z
 ```
@@ -274,10 +274,10 @@ gradlew checkDeps
 
 **Output**:
 ```
-Checking ConsoleZ dependencies configuration...
+Checking shell dependencies configuration...
 --------------------------------------------------------------------------------
 
-consolez1.19.0.19104:
+shell7.5.4:
   Dependencies file: Found (5 dependencies)
     - ansicon: https://github.com/adoxa/ansicon/releases/download/v1.89/ansi189.zip
     - clink: https://github.com/chrisant996/clink/releases/download/v1.5.3/clink-1.5.3.zip
@@ -313,17 +313,17 @@ gradlew info
 **Output**:
 ```
 ================================================================
-  Bearsampp Module ConsoleZ - Build Information
+  Bearsampp module Shell - Build Information
 ================================================================
 
 Bundle Configuration:
-  Name:           consolez
-  Release:        r1
+  Name:           shell
+  Release:        2025.11.13
   Type:           tools
   Format:         7z
 
 Paths:
-  Project:        E:/Bearsampp-development/module-consolez
+  Project:        E:/Bearsampp-development/module-shell
   Dev:            E:/Bearsampp-development/dev
   Build Output:   C:/Bearsampp-build
 
@@ -339,7 +339,7 @@ Available Tasks:
   gradle clean             - Clean build artifacts
 
 Examples:
-  gradle release -PbundleVersion=1.19.0.19104
+  gradle release -PbundleVersion=7.5.4
   gradle releaseAll
 
 ================================================================
@@ -368,14 +368,14 @@ gradlew listVersions
 
 **Output**:
 ```
-Available consolez versions:
+Available shell versions:
 ------------------------------------------------------------
-  1.19.0.19104         [bin]
+  7.5.4         [bin]
 ------------------------------------------------------------
 Total versions: 1
 
 To build a specific version:
-  gradle release -PbundleVersion=1.19.0.19104
+  gradle release -PbundleVersion=7.5.4
 ```
 
 ---
@@ -401,9 +401,9 @@ gradlew listReleases
 
 **Output**:
 ```
-Available ConsoleZ Releases:
+Available shell Releases:
 --------------------------------------------------------------------------------
-  1.19.0.19104    -> https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
+  7.5.4    -> https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
 --------------------------------------------------------------------------------
 Total releases: 1
 ```
@@ -500,7 +500,7 @@ Execute multiple tasks in sequence:
 
 ```powershell
 # Clean, verify, and build
-gradlew clean verify release -PbundleVersion=1.19.0.19104
+gradlew clean verify release -PbundleVersion=7.5.4
 
 # Validate and build all
 gradlew validateProperties releaseAll
@@ -520,7 +520,7 @@ Enable parallel execution for faster builds:
 See what tasks would be executed without running them:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --dry-run
+gradlew release -PbundleVersion=7.5.4 --dry-run
 ```
 
 ### Debug Mode
@@ -528,7 +528,7 @@ gradlew release -PbundleVersion=1.19.0.19104 --dry-run
 Run tasks with debug output:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --debug
+gradlew release -PbundleVersion=7.5.4 --debug
 ```
 
 ### Info Mode
@@ -536,7 +536,7 @@ gradlew release -PbundleVersion=1.19.0.19104 --debug
 Run tasks with info-level logging:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --info
+gradlew release -PbundleVersion=7.5.4 --info
 ```
 
 ### Stacktrace
@@ -544,7 +544,7 @@ gradlew release -PbundleVersion=1.19.0.19104 --info
 Show full stacktrace on errors:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --stacktrace
+gradlew release -PbundleVersion=7.5.4 --stacktrace
 ```
 
 ### Continuous Build
@@ -552,7 +552,7 @@ gradlew release -PbundleVersion=1.19.0.19104 --stacktrace
 Automatically re-run tasks when files change:
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --continuous
+gradlew release -PbundleVersion=7.5.4 --continuous
 ```
 
 ### Build Cache
@@ -569,7 +569,7 @@ Use build cache for faster builds (already enabled):
 Build without network access (uses cached dependencies):
 
 ```powershell
-gradlew release -PbundleVersion=1.19.0.19104 --offline
+gradlew release -PbundleVersion=7.5.4 --offline
 ```
 
 ---
@@ -580,16 +580,16 @@ gradlew release -PbundleVersion=1.19.0.19104 --offline
 
 ```
 ======================================================================
-Building consolez 1.19.0.19104 release
+Building shell 7.5.4 release
 ======================================================================
 
-Bundle path: E:/Bearsampp-development/module-consolez/bin/consolez1.19.0.19104
+Bundle path: E:/Bearsampp-development/module-shell/bin/shell7.5.4
 
-Downloading consolez 1.19.0.19104 from modules-untouched...
-  Downloading from: https://github.com/Bearsampp/module-consolez/releases/download/r1/bearsampp-consolez-1.19.0.19104-r1.7z
-  Destination: bearsampp-consolez-1.19.0.19104-r1.7z
+Downloading shell 7.5.4 from modules-untouched...
+  Downloading from: https://github.com/Bearsampp/module-shell/releases/download/2025.11.13/bearsampp-shell-7.5.4-2025.11.13.7z
+  Destination: bearsampp-shell-7.5.4-2025.11.13.7z
   Progress: 100% - Complete
-Extracting bearsampp-consolez-1.19.0.19104-r1.7z...
+Extracting bearsampp-shell-7.5.4-2025.11.13.7z...
 Verified: Console.exe found
 
 Copying bundle files...
@@ -613,20 +613,20 @@ Check Clink
 Verified: clink.bat
 
 Preparing archive...
-Compressing consolez1.19.0.19104 to bearsampp-consolez-1.19.0.19104-r1.7z...
+Compressing shell7.5.4 to bearsampp-shell-7.5.4-2025.11.13.7z...
 Using 7-Zip: C:\Program Files\7-Zip\7z.exe
-Archive created: C:\Bearsampp-build\tools\consolez\r1\bearsampp-consolez-1.19.0.19104-r1.7z
+Archive created: C:\Bearsampp-build\tools\shell\2025.11.13\bearsampp-shell-7.5.4-2025.11.13.7z
 
 Generating hash files...
-  Created: bearsampp-consolez-1.19.0.19104-r1.7z.md5
-  Created: bearsampp-consolez-1.19.0.19104-r1.7z.sha1
-  Created: bearsampp-consolez-1.19.0.19104-r1.7z.sha256
-  Created: bearsampp-consolez-1.19.0.19104-r1.7z.sha512
+  Created: bearsampp-shell-7.5.4-2025.11.13.7z.md5
+  Created: bearsampp-shell-7.5.4-2025.11.13.7z.sha1
+  Created: bearsampp-shell-7.5.4-2025.11.13.7z.sha256
+  Created: bearsampp-shell-7.5.4-2025.11.13.7z.sha512
 
 ======================================================================
-[SUCCESS] Release build completed successfully for version 1.19.0.19104
-Output directory: C:\Bearsampp-build\tools\consolez\r1
-Archive: bearsampp-consolez-1.19.0.19104-r1.7z
+[SUCCESS] Release build completed successfully for version 7.5.4
+Output directory: C:\Bearsampp-build\tools\shell\2025.11.13
+Archive: bearsampp-shell-7.5.4-2025.11.13.7z
 ======================================================================
 ```
 

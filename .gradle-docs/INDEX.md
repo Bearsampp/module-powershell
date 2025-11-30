@@ -1,12 +1,12 @@
-# Bearsampp Module ConsoleZ - Documentation Index
+# Bearsampp module Shell - Documentation Index
 
-Welcome to the Bearsampp Module ConsoleZ Gradle build documentation.
+Welcome to the Bearsampp module Shell Gradle build documentation.
 
 ---
 
 ## Documentation Structure
 
-This directory contains comprehensive documentation for building and maintaining the ConsoleZ module using Gradle.
+This directory contains comprehensive documentation for building and maintaining the Shell (PowerShell) module using Gradle.
 
 ### Available Documents
 
@@ -64,10 +64,10 @@ This directory contains comprehensive documentation for building and maintaining
 
 ```powershell
 # Build specific version
-gradlew release -PbundleVersion=1.19.0.19104
+gradle release -PbundleVersion=7.5.4
 
 # Build all versions
-gradlew releaseAll
+gradle releaseAll
 ```
 
 **Documentation**: [Build Tasks](TASKS.md#build-tasks)
@@ -78,7 +78,7 @@ gradlew releaseAll
 
 ```powershell
 # Check build environment
-gradlew verify
+gradle verify
 ```
 
 **Documentation**: [Verification Tasks](TASKS.md#verification-tasks)
@@ -89,10 +89,10 @@ gradlew verify
 
 ```powershell
 # List versions in bin/ directory
-gradlew listVersions
+gradle listVersions
 
 # List releases from releases.properties
-gradlew listReleases
+gradle listReleases
 ```
 
 **Documentation**: [Information Tasks](TASKS.md#information-tasks)
@@ -151,7 +151,7 @@ Common issues and solutions:
 **Purpose**: Complete reference for all Gradle tasks
 
 **Contents**:
-- Build tasks (release, releaseAll, clean, downloadConsoleZ)
+- Build tasks (release, releaseAll, clean)
 - Verification tasks (verify, validateProperties, checkDeps)
 - Information tasks (info, listVersions, listReleases)
 - Gradle built-in tasks
@@ -172,7 +172,7 @@ Common issues and solutions:
 - Build properties (bundle.name, bundle.release, bundle.type, bundle.format, build.path)
 - Gradle properties (daemon, parallel, caching, JVM args)
 - Release properties (version mappings)
-- Dependency configuration (ANSICON, Clink, GnuWin32)
+- Dependency configuration (Clink, Clink-completions, Oh My Posh)
 - Environment variables
 - Advanced configuration options
 - Configuration best practices
@@ -254,8 +254,8 @@ When updating documentation:
 
 ### Version Information
 
-- **Last Updated**: 2024
-- **Gradle Version**: 7.0+
+- **Last Updated**: 2025
+- **Gradle Version**: 8.0+
 - **Build System**: Pure Gradle (Ant-free)
 
 ---
@@ -267,8 +267,8 @@ When updating documentation:
 | Resource                      | URL                                                          |
 |-------------------------------|--------------------------------------------------------------|
 | Bearsampp Official Website    | https://bearsampp.com                                        |
-| ConsoleZ Module Page          | https://bearsampp.com/module/consolez                        |
-| GitHub Repository             | https://github.com/bearsampp/module-consolez                 |
+| Shell Module Page             | https://bearsampp.com/module/shell                           |
+| GitHub Repository             | https://github.com/bearsampp/module-shell                    |
 | Bearsampp Main Project        | https://github.com/bearsampp/bearsampp                       |
 | Issue Tracker                 | https://github.com/bearsampp/bearsampp/issues                |
 | Gradle Documentation          | https://docs.gradle.org                                      |
@@ -307,6 +307,6 @@ We welcome feedback on documentation:
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: 2025
 **Documentation Version**: 1.0
 **Build System**: Pure Gradle
