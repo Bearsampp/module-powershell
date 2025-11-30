@@ -1,0 +1,25 @@
+# Jetbrains
+/*.iml
+/.idea
+
+# Bearsampp
+/.dev
+
+# Visual Studio
+.vscode/
+.vs/
+.vsc/
+
+# ignore "current" directories
+/**/current
+
+# Qodo
+/.qodo
+
+# Gradle
+.gradle/
+build/
+.gradletasknamecache
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
