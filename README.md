@@ -24,34 +24,7 @@ This PowerShell module requires a **Nerd Font** to display Oh My Posh icons and 
 - **Font Name**: CaskaydiaCove NF (Cascadia Code Nerd Font)
 - **Installation**: Should be installed system-wide via Bearsampp prerequisites
 
-#### Configuring the Font
-
-**Windows Terminal (Recommended)**
-
-If using Windows Terminal, add this to your `settings.json`:
-
-```json
-{
-    "profiles": {
-        "defaults": {
-            "font": {
-                "face": "CaskaydiaCove NF",
-                "size": 10
-            }
-        }
-    }
-}
-```
-
-**Windows Console Host (conhost.exe)**
-1. Right-click the title bar → Properties
-2. Go to the Font tab
-3. Select "CaskaydiaCove NF" from the font list
-4. Click OK
-
-**PowerShell Console**
-
-The font is automatically used if it's set as the default console font in Windows.
+The font is automatically configured when using PowerShell within the Bearsampp environment.
 
 ### Build System
 
