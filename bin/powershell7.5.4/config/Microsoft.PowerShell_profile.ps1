@@ -12,7 +12,7 @@ $env:POSH_ROOT = Join-Path $SHELL_ROOT "vendor\oh-my-posh"
 # This is required for Oh My Posh icons and glyphs to display correctly
 try {
     # Set console font to CaskaydiaCove NF
-    $Host.UI.RawUI.WindowTitle = "Bearsampp PowerShell"
+    $Host.UI.RawUI.WindowTitle = "Bearsampp PowerShell Console"
     
     # Note: Font configuration is typically set in Windows Terminal settings.json
     # or via registry for Windows Console Host. The font should be installed system-wide.

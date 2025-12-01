@@ -1012,28 +1012,28 @@ tasks.named('clean') {
         }
 
         // Clean temp directories but preserve bundles_build
-        if (bundleTmpPath.exists()) {
-            println "Cleaning tmp directories (preserving bundles_build)..."
+        println "Cleaning tmp directories (preserving bundles_build)..."
 
-            // List of directories to clean (excluding bundles_build)
-            def dirsToClean = [
-                file("${buildTmpPath}/bundles_prep"),
-                file("${buildTmpPath}/bundles_src"),
-                file("${buildTmpPath}/downloads"),
-                file("${buildTmpPath}/extract"),
-                file("${buildTmpPath}/untouched"),
-                file("${buildTmpPath}/ansicon-temp"),
-                file("${buildTmpPath}/gnuwin32-bin-temp"),
-                file("${buildTmpPath}/gnuwin32-dep-temp")
-            ]
+        // List of directories to clean (excluding bundles_build)
+        def dirsToClean = [
+            file("${buildTmpPath}/bundles_prep"),
+            file("${buildTmpPath}/bundles_src"),
+            file("${buildTmpPath}/downloads"),
+            file("${buildTmpPath}/extract"),
+            file("${buildTmpPath}/untouched"),
+            file("${buildTmpPath}/ansicon-temp"),
+            file("${buildTmpPath}/gnuwin32-bin-temp"),
+            file("${buildTmpPath}/gnuwin32-dep-temp")
+        ]
 
-            dirsToClean.each { dir ->
-                if (dir.exists()) {
-                    delete dir
-                    println "  Cleaned: ${dir}"
-                }
+        dirsToClean.each { dir ->
+            if (dir.exists()) {
+                delete dir
+                println "  Cleaned: ${dir}"
             }
+        }
 
+        if (file("${buildTmpPath}/bundles_build").exists()) {
             println "  Preserved: ${buildTmpPath}/bundles_build"
         }
 
