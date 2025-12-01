@@ -30,13 +30,13 @@ This is a module of [Bearsampp project](https://github.com/bearsampp/bearsampp) 
 
 ## Overview
 
-The Shell module provides PowerPowerShell 7+ with enhanced console features including Clink for command-line completion, Clink-completions for extended completions, and Oh My Posh for beautiful prompt themes. This Gradle build system automates the process of downloading, configuring, and packaging shell releases for Bearsampp.
+The PowerShell module provides PowerShell 7+ with enhanced console features including PSReadLine (built-in) for advanced command-line editing and Oh My Posh for beautiful prompt themes. This Gradle build system automates the process of downloading, configuring, and packaging PowerShell releases for Bearsampp.
 
 ### Key Features
 
 - **Pure Gradle Build**: Modern build system with no Ant dependencies
 - **Automated Downloads**: Fetches PowerShell and dependencies from modules-untouched repository
-- **Dependency Management**: Handles Clink, Clink completions, Oh My Posh, and themes
+- **Dependency Management**: Handles Oh My Posh and themes
 - **Hash Generation**: Automatically generates MD5, SHA1, SHA256, and SHA512 checksums
 - **Multi-Version Support**: Build single or multiple versions simultaneously
 - **Interactive Mode**: User-friendly version selection interface
@@ -187,8 +187,6 @@ Maps shell versions to download URLs:
 3. **Dependency Processing**
    - Reads `deps.properties` from version directory
    - Downloads and extracts dependencies:
-     - **Clink**: Command-line editing and completion
-     - **Clink Completions**: Additional completion scripts
      - **Oh My Posh**: Beautiful prompt themes
      - **Oh My Posh Themes**: Theme configuration files
 
@@ -248,24 +246,21 @@ module-shell/
 
 ## Dependencies
 
-### shell dependencies
+### PowerShell dependencies
 
 PowerShell bundles include the following dependencies, configured in `deps.properties`:
 
 | Dependency                    | Purpose                                    | Location                          |
 |-------------------------------|--------------------------------------------|------------------------------------|
-| Clink                         | Command-line editing and completion        | `vendor/clink/`                    |
-| Clink Completions             | Additional completion scripts              | `vendor/clink-completions/`        |
+| PSReadLine                    | Advanced command-line editing (built-in)   | Built into PowerShell 7+           |
 | Oh My Posh                    | Beautiful prompt themes                    | `vendor/oh-my-posh/`               |
 | Oh My Posh Themes             | Theme configuration files                  | `vendor/oh-my-posh/themes/`        |
 
 ### Example deps.properties
 
 ```properties
-clink = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/clink.1.9.2.6aa2e0.zip
-clink_completions = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/clink-completions-0.6.7.zip
-oh_my_posh = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/posh-windows-amd64.exe
-oh_my_posh_theme = https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/paradox.omp.json
+oh_my_posh = https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-windows-amd64.exe
+oh_my_posh_theme = https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/paradox.omp.json
 ```
 
 ---

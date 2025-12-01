@@ -1,8 +1,8 @@
 /*
- * Bearsampp Module Shell - Gradle Settings
+ * Bearsampp Module PowerShell - Gradle Settings
  */
 
-rootProject.name = 'module-shell'
+rootProject.name = 'module-powershell'
 
 // Enable Gradle features for better performance
 enableFeaturePreview('STABLE_CONFIGURATION_CACHE')
@@ -19,7 +19,7 @@ buildCache {
 gradle.rootProject {
     println """
     ================================================================
-      Initializing Bearsampp Module Shell Build
+      Initializing Bearsampp Module PowerShell Build
     ================================================================
     """.stripIndent()
 }

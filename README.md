@@ -1,7 +1,7 @@
 <p align="center"><a href="https://bearsampp.com/contribute" target="_blank"><img width="250" src="img/Bearsampp-logo.svg"></a></p>
 
-[![GitHub release](https://img.shields.io/github/release/bearsampp/module-shell.svg?style=flat-square)](https://github.com/bearsampp/module-shell/releases/latest)
-![Total downloads](https://img.shields.io/github/downloads/bearsampp/module-shell/total.svg?style=flat-square)
+[![GitHub release](https://img.shields.io/github/release/bearsampp/module-powershell.svg?style=flat-square)](https://github.com/bearsampp/module-powershell/releases/latest)
+![Total downloads](https://img.shields.io/github/downloads/bearsampp/module-powershell/total.svg?style=flat-square)
 
 This is a module of [Bearsampp project](https://github.com/bearsampp/bearsampp) involving PowerShell with enhanced features, built with a pure Gradle build system.
 
@@ -109,14 +109,14 @@ Comprehensive documentation is available in the `.gradle-docs/` directory:
 ## Project Structure
 
 ```
-module-shell/
+module-powershell/
 ├── .gradle-docs/                 # Build documentation
 │   ├── README.md                 # Main documentation
 │   ├── TASKS.md                  # Task reference
 │   ├── CONFIGURATION.md          # Configuration guide
 │   └── TROUBLESHOOTING.md        # Troubleshooting guide
 ├── bin/                          # Shell version directories
-│   └── shell{version}/           # Version-specific files
+│   └── powershell{version}/           # Version-specific files
 │       ├── deps.properties       # Dependencies configuration
 │       └── bearsampp.conf        # Bearsampp configuration
 ├── build.gradle                  # Main Gradle build script
@@ -135,7 +135,7 @@ module-shell/
 Core build configuration:
 
 ```properties
-bundle.name     = shell           # Module name
+bundle.name     = powershell           # Module name
 bundle.release  = 2025.11.13      # Release identifier
 bundle.type     = tools           # Bundle category
 bundle.format   = 7z              # Archive format (7z or zip)
@@ -144,7 +144,7 @@ bundle.format   = 7z              # Archive format (7z or zip)
 
 ### deps.properties
 
-Dependencies configuration for each version (located in `bin/shell{version}/deps.properties`):
+Dependencies configuration for each version (located in `bin/powershell{version}/deps.properties`):
 
 ```properties
 oh_my_posh = https://github.com/Bearsampp/modules-untouched/releases/download/Cmder-2025.11.25/posh-windows-amd64.exe
@@ -213,13 +213,13 @@ Build artifacts are organized as follows:
 ```
 C:/Bearsampp-build/
 └── tools/
-    └── shell/
+    └── powershell/
         └── 2025.11.13/
-            ├── bearsampp-shell-7.5.4-2025.11.13.7z
-            ├── bearsampp-shell-7.5.4-2025.11.13.7z.md5
-            ├── bearsampp-shell-7.5.4-2025.11.13.7z.sha1
-            ├── bearsampp-shell-7.5.4-2025.11.13.7z.sha256
-            └── bearsampp-shell-7.5.4-2025.11.13.7z.sha512
+            ├── bearsampp-powershell-7.5.4-2025.11.13.7z
+            ├── bearsampp-powershell-7.5.4-2025.11.13.7z.md5
+            ├── bearsampp-powershell-7.5.4-2025.11.13.7z.sha1
+            ├── bearsampp-powershell-7.5.4-2025.11.13.7z.sha256
+            └── bearsampp-powershell-7.5.4-2025.11.13.7z.sha512
 ```
 
 ---
@@ -278,8 +278,8 @@ Edit the `Set-PSReadLineOption` calls in the profile to customize:
 
 ## Documentation and Downloads
 
-- **Official Website**: https://bearsampp.com/module/shell
-- **GitHub Repository**: https://github.com/bearsampp/module-shell
+- **Official Website**: https://bearsampp.com/module/powershell
+- **GitHub Repository**: https://github.com/bearsampp/module-powershell
 - **Build Documentation**: [.gradle-docs/README.md](.gradle-docs/README.md)
 
 ---

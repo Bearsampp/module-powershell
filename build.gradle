@@ -1,5 +1,5 @@
 /*
- * Bearsampp Module Shell - Gradle Build Script
+ * Bearsampp Module PowerShell - Gradle Build Script
  *
  * This build script converts the Ant-based build process to Gradle while maintaining
  * all features, tasks, methods, and functions from the original build.xml.
@@ -29,7 +29,7 @@ def buildProps = new Properties()
 buildPropsFile.withInputStream { buildProps.load(it) }
 
 // Bundle configuration from build.properties
-ext.bundleName = buildProps.getProperty('bundle.name', 'shell')
+ext.bundleName = buildProps.getProperty('bundle.name', 'powershell')
 ext.bundleRelease = buildProps.getProperty('bundle.release', 'r1')
 ext.bundleType = buildProps.getProperty('bundle.type', 'tools')
 ext.bundleFormat = buildProps.getProperty('bundle.format', '7z')
@@ -147,7 +147,6 @@ def find7ZipExecutable() {
 
 /**
  * Download a file from URL with progress indication
- * Always downloads fresh - no caching to avoid stale files
  */
 def downloadFile(String url, File destFile) {
     println "  Downloading from: ${url}"
@@ -155,15 +154,13 @@ def downloadFile(String url, File destFile) {
 
     destFile.parentFile.mkdirs()
 
-    // Delete existing file to force fresh download
+    // Delete existing file if present
     if (destFile.exists()) {
-        println "  Removing cached file to force fresh download"
         destFile.delete()
     }
 
     def connection = new URL(url).openConnection()
     connection.setRequestProperty('User-Agent', 'Bearsampp-Build')
-    connection.setUseCaches(false) // Disable HTTP caching
 
     def contentLength = connection.getContentLengthLong()
     def inputStream = connection.getInputStream()
@@ -195,10 +192,9 @@ def downloadFile(String url, File destFile) {
 
 /**
  * Download and extract a dependency from URL
- * Always downloads fresh - no caching to avoid stale files
  */
 def downloadAndExtract(String url, File destDir) {
-    // Use shared downloads cache directory
+    // Use shared downloads directory
     def downloadsDir = file(bundleTmpDownloadPath)
     downloadsDir.mkdirs()
 
@@ -206,8 +202,6 @@ def downloadAndExtract(String url, File destDir) {
     def filename = url.substring(url.lastIndexOf('/') + 1)
     def destFile = file("${downloadsDir}/${filename}")
 
-    // Always download fresh - no caching
-    println "  Downloading fresh copy (no cache)"
     downloadFile(url, destFile)
 
     // Extract the archive
@@ -250,7 +244,7 @@ def downloadAndExtract(String url, File destDir) {
 }
 
 /**
- * PRIMARY source of versions/URLs: modules-untouched shell.properties
+ * PRIMARY source of versions/URLs: modules-untouched powershell.properties
  * Fallbacks: local releases.properties, then constructed standard URL
  */
 def fetchModulesUntouchedProperties() {
@@ -318,28 +312,21 @@ def downloadFromModulesUntouched(String name, String version) {
         println "  Constructed fallback URL (verify manually if needed):\n  ${url}"
     }
 
-    println "Downloading ${name} ${version} (no cache)..."
+    println "Downloading ${name} ${version}..."
 
-    // Create shared download cache directory under bearsampp-build/tmp
+    // Create shared download directory under bearsampp-build/tmp
     def downloadsDir = file(bundleTmpDownloadPath)
     downloadsDir.mkdirs()
-
-    // Keep a small area for untouched archives if needed in the future
-    def tempDir = file("${buildTmpPath}/untouched")
-    tempDir.mkdirs()
 
     // Determine filename from URL
     def filename = url.substring(url.lastIndexOf('/') + 1)
     def destFile = file("${downloadsDir}/${filename}")
 
-    // Always download fresh - no caching
-    println "Downloading fresh copy (no cache)"
     downloadFile(url, destFile)
 
     // Extract to shared extract directory: bearsampp-build/tmp/extract/{bundleName}/{version}
     def extractDir = file("${bundleTmpExtractPath}/${version}")
     if (extractDir.exists()) {
-        println "Removing cached extraction directory"
         delete extractDir
     }
     extractDir.mkdirs()
@@ -372,7 +359,7 @@ def downloadFromModulesUntouched(String name, String version) {
         ant.unzip(src: destFile, dest: extractDir, overwrite: true)
     }
 
-    // For shell module, the extracted directory is the PowerShell root
+    // For PowerShell module, the extracted directory is the PowerShell root
     return extractDir
 }
 
@@ -388,7 +375,7 @@ tasks.register('info') {
     doLast {
         println """
         ================================================================
-          Bearsampp Module Shell - Build Information
+          Bearsampp Module PowerShell - Build Information
         ================================================================
 
         Bundle Configuration:
@@ -582,19 +569,12 @@ tasks.register('release') {
         println ""
 
         try {
-            // Always download fresh from modules-untouched
-            def tmpExtractPath = file("${bundleTmpExtractPath}/${bundleVersion}")
-            if (tmpExtractPath.exists()) {
-                println "  Removing cached extraction directory"
-                delete tmpExtractPath
-            }
-
             bundleSrcFinal = downloadFromModulesUntouched(bundleName, bundleVersion)
         } catch (Exception e) {
             throw new GradleException("""
                 Failed to download PowerShell binaries: ${e.message}
 
-                Check that version ${bundleVersion} exists in modules-untouched shell.properties
+                Check that version ${bundleVersion} exists in modules-untouched powershell.properties
             """.stripIndent())
         }
 
@@ -655,7 +635,6 @@ tasks.register('release') {
                 def filename = ohMyPoshUrl.substring(ohMyPoshUrl.lastIndexOf('/') + 1)
                 def finalDestFile = file("${ohMyPoshPath}/${filename}")
 
-                // Always download fresh
                 def downloadsDir = file(bundleTmpDownloadPath)
                 downloadsDir.mkdirs()
                 def downloadedFile = file("${downloadsDir}/${filename}")
@@ -688,7 +667,6 @@ tasks.register('release') {
                 def filename = ohMyPoshThemeUrl.substring(ohMyPoshThemeUrl.lastIndexOf('/') + 1)
                 def destFile = file("${ohMyPoshThemePath}/${filename}")
 
-                // Always download fresh
                 def downloadsDir = file(bundleTmpDownloadPath)
                 downloadsDir.mkdirs()
                 def downloadedFile = file("${downloadsDir}/${filename}")
@@ -757,39 +735,37 @@ tasks.register('release') {
         println ""
         println "Preparing archive..."
 
-        // Prepare output directory
-        def consolezPrepPath = file("${bundleTmpPrepPath}/${bundleFolder}")
-        if (consolezPrepPath.exists()) {
-            delete consolezPrepPath
+        // Prepare output directory (standard Bruno approach)
+        if (bundleTmpPrepPath.exists()) {
+            delete bundleTmpPrepPath
         }
-        consolezPrepPath.mkdirs()
+        bundleTmpPrepPath.mkdirs()
 
         // Copy all files to prep directory
         copy {
             from bundleSrcFinal
-            into consolezPrepPath
+            into bundleTmpPrepPath
         }
 
         // Copy bundle files again (overwrite)
         copy {
             from bundlePath
-            into consolezPrepPath
+            into bundleTmpPrepPath
             exclude 'deps.properties'
         }
 
         // Copy to bundles_build directory (non-zip dev artifact)
         println ""
         println "Copying to bundles_build directory..."
-        def nonZipBuildPath = file("${bundleTmpBuildPath}/${bundleFolder}")
-        if (nonZipBuildPath.exists()) {
-            delete nonZipBuildPath
+        if (bundleTmpBuildPath.exists()) {
+            delete bundleTmpBuildPath
         }
-        nonZipBuildPath.mkdirs()
+        bundleTmpBuildPath.mkdirs()
         copy {
-            from consolezPrepPath
-            into nonZipBuildPath
+            from bundleTmpPrepPath
+            into bundleTmpBuildPath
         }
-        println "Non-zip version available at: ${nonZipBuildPath}"
+        println "Non-zip version available at: ${bundleTmpBuildPath}"
 
         // Determine build output path following Bearsampp pattern
         // bearsampp-build/{bundleType}/{bundleName}/{bundleRelease}
@@ -808,7 +784,7 @@ tasks.register('release') {
                 delete archiveFile
             }
 
-            println "Compressing ${bundleName}${bundleVersion} to ${archiveFile.name}..."
+            println "Compressing ${bundleName}-${bundleVersion} to ${archiveFile.name}..."
 
             // Find 7z executable
             def sevenZipExe = find7ZipExecutable()
@@ -818,17 +794,16 @@ tasks.register('release') {
 
             println "Using 7-Zip: ${sevenZipExe}"
 
-            // Create 7z archive
-            // Include the version folder itself, not only its contents
+            // Create 7z archive (standard Bruno approach - archive the directory contents)
             def command = [
                 sevenZipExe,
                 'a',
                 '-t7z',
                 archiveFile.absolutePath.toString(),
-                bundleFolder
+                '.'
             ]
 
-            // Run from the prep parent directory so the folder is included at archive root
+            // Run from the prep directory to archive its contents
             def process = new ProcessBuilder(command as String[])
                 .directory(bundleTmpPrepPath)
                 .redirectErrorStream(true)
@@ -856,10 +831,10 @@ tasks.register('release') {
                 delete archiveFile
             }
 
-            println "Compressing ${bundleName}${bundleVersion} to ${archiveFile.name}..."
+            println "Compressing ${bundleName}-${bundleVersion} to ${archiveFile.name}..."
 
-            // Include the version folder itself, not only its contents
-            ant.zip(destfile: archiveFile, basedir: bundleTmpPrepPath, includes: "${bundleFolder}/**")
+            // Archive the directory contents (standard Bruno approach)
+            ant.zip(destfile: archiveFile, basedir: bundleTmpPrepPath)
 
             println "Archive created: ${archiveFile}"
 
@@ -895,7 +870,7 @@ tasks.register('release') {
         println ""
         println "=".multiply(70)
         println "[SUCCESS] Release build completed successfully for version ${versionToBuild}"
-        println "Output directory: ${nonZipBuildPath}"
+        println "Output directory: ${bundleTmpBuildPath}"
         println "Archive: ${destFile}.${bundleFormat}"
         println "=".multiply(70)
     }
@@ -1072,7 +1047,7 @@ tasks.register('verify') {
     description = 'Verify build environment and dependencies'
 
     doLast {
-        println "Verifying build environment for module-shell..."
+        println "Verifying build environment for module-powershell..."
 
         def checks = [:]
 
@@ -1279,10 +1254,10 @@ tasks.register('validateProperties') {
     }
 }
 
-// Task: Check Shell dependencies configuration
+// Task: Check PowerShell dependencies configuration
 tasks.register('checkDeps') {
     group = 'verification'
-    description = 'Check Shell dependencies configuration in bin directories'
+    description = 'Check PowerShell dependencies configuration in bin directories'
 
     doLast {
         def binDir = file("${projectDir}/bin")
@@ -1291,7 +1266,7 @@ tasks.register('checkDeps') {
             return
         }
 
-        println "\nChecking Shell dependencies configuration..."
+        println "\nChecking PowerShell dependencies configuration..."
         println "-".multiply(80)
 
         def versions = binDir.listFiles()
@@ -1317,20 +1292,20 @@ tasks.register('checkDeps') {
     }
 }
 
-// Task: Download ConsoleZ package directly
-tasks.register('downloadConsoleZ') {
+// Task: Download PowerShell package directly
+tasks.register('downloadPowerShell') {
     group = 'build'
-    description = 'Download ConsoleZ package from modules-untouched (use -PconsolezVersion=X.X.X.X)'
+    description = 'Download PowerShell package from modules-untouched (use -PpowershellVersion=X.X.X)'
 
-    def consolezVersionProperty = project.findProperty('consolezVersion')
+    def powershellVersionProperty = project.findProperty('powershellVersion')
 
     doLast {
-        def version = consolezVersionProperty
+        def version = powershellVersionProperty
         if (!version) {
-            throw new GradleException("Please specify consolez version: gradle downloadConsoleZ -PconsolezVersion=1.19.0.19104")
+            throw new GradleException("Please specify powershell version: gradle downloadPowerShell -PpowershellVersion=7.5.4")
         }
 
-        println "Downloading ConsoleZ ${version}..."
+        println "Downloading PowerShell ${version}..."
         def extractDir = downloadFromModulesUntouched(bundleName, version)
         println "[SUCCESS] Downloaded and extracted to: ${extractDir}"
     }
@@ -1343,7 +1318,7 @@ tasks.register('downloadConsoleZ') {
 gradle.taskGraph.whenReady { graph ->
     println """
     ================================================================
-      Bearsampp Module Shell - Gradle Build
+      Bearsampp Module PowerShell - Gradle Build
     ================================================================
     """.stripIndent()
 }
