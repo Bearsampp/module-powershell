@@ -1,0 +1,182 @@
+<header class="intro-header mx-auto"><img src="images/logo/powershell-logo.png" loading="lazy" width="694" height="273" data-path="local-images:/logo/powershell-logo.png" style="display: block; margin-left: auto; margin-right: auto;"></header>
+
+<div class="vardown-body">
+
+<h3 id="about">About</h3>
+
+<a href="https://github.com/bearsampp/module-powershell" target="_blank" rel="noopener"><i class="fa fa-github fa-lg" aria-hidden="true"></i>PowerShell module source </a>
+
+<ul>
+
+<li><a href="https://github.com/PowerShell/PowerShell" target="_blank" rel="noopener">https://github.com/PowerShell/PowerShell</a></li>
+
+<li><a href="https://docs.microsoft.com/en-us/powershell/" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/powershell/</a></li>
+
+<li><a href="https://ohmyposh.dev/" target="_blank" rel="noopener">https://ohmyposh.dev/</a> (Oh My Posh themes)</li>
+
+</ul>
+
+<p>This module provides PowerShell 7+ with enhanced console features including:</p>
+
+<ul>
+
+<li><strong>Oh My Posh</strong> - Beautiful and customizable prompt themes</li>
+
+<li><strong>PSReadLine</strong> - Advanced command-line editing and history</li>
+
+<li><strong>Nerd Fonts</strong> - Rich icon and glyph support</li>
+
+</ul>
+
+<div class="alert alert-warning">
+<strong>Font Requirement:</strong> This PowerShell module requires <strong>CaskaydiaCove NF</strong> (Cascadia Code Nerd Font) to display Oh My Posh icons and glyphs correctly. The font should be installed system-wide via Bearsampp prerequisites.
+</div>
+
+<h3 id="installation">Installation</h3>
+
+<ul>
+
+<li>Download and install <a href="get-started/">bearsampp</a>.</li>
+
+<li>If you already have installed bearsampp, stop it.</li>
+
+<li>Download a <a href="#releases">PowerShell version</a> of your choice.</li>
+
+<li>Extract archive in <code class="highlighter-rouge">bearsampp\\tools\\powershell\\</code>. Directory structure example :</li>
+
+</ul>
+
+</div>
+
+<pre class="highlight"><code class="highlighter-rouge">\[-\] bearsampp
+
+| \[-\] tools
+
+| | \[-\] powershell
+
+| | | \[-\] powershell7.5.4
+
+| | | bearsampp.conf
+
+</code></pre>
+
+<div class="vardown-body">
+
+<ul>
+
+<li>Edit the <code class="highlighter-rouge">bearsampp.conf</code> file and replace the key <code class="highlighter-rouge">powershellVersion</code> with the correct version.</li>
+
+<li>Start <var>bearsampp</var>.</li>
+
+</ul>
+
+<h3 id="features">Features</h3>
+
+<ul>
+
+<li><strong>Oh My Posh Themes</strong> - Beautiful, customizable prompt themes with rich visual indicators</li>
+
+<li><strong>PSReadLine</strong> - Advanced command-line editing with syntax highlighting</li>
+
+<li><strong>Auto-completion</strong> - Intelligent command and path completion</li>
+
+<li><strong>Command History</strong> - Persistent command history across sessions</li>
+
+<li><strong>Nerd Font Icons</strong> - Rich visual indicators and glyphs</li>
+
+</ul>
+
+<h3 id="configuration">Configuration</h3>
+
+<h4>Changing Oh My Posh Theme</h4>
+
+<p>Edit the PowerShell profile (<code class="highlighter-rouge">Microsoft.PowerShell_profile.ps1</code>) and change the theme file:</p>
+
+<pre class="highlight"><code class="highlighter-rouge">$ohMyPoshTheme = Join-Path $env:POSH_ROOT "themes\\YOUR_THEME.omp.json"</code></pre>
+
+<p>Available themes are in <code class="highlighter-rouge">vendor/oh-my-posh/themes/</code>. Popular themes include:</p>
+
+<ul>
+
+<li><strong>paradox</strong> (default) - Clean and informative</li>
+
+<li><strong>agnoster</strong> - Classic powerline theme</li>
+
+<li><strong>powerlevel10k_rainbow</strong> - Colorful and feature-rich</li>
+
+<li><strong>atomic</strong> - Minimalist design</li>
+
+</ul>
+
+<p>Browse all themes at <a href="https://ohmyposh.dev/docs/themes" target="_blank" rel="noopener">ohmyposh.dev/docs/themes</a></p>
+
+<h4>Font Configuration</h4>
+
+<p>For Windows Terminal, add this to your <code class="highlighter-rouge">settings.json</code>:</p>
+
+<pre class="highlight"><code class="highlighter-rouge">{
+    "profiles": {
+        "defaults": {
+            "font": {
+                "face": "CaskaydiaCove NF",
+                "size": 10
+            }
+        }
+    }
+}</code></pre>
+
+<h3 id="building">Building from Source</h3>
+
+<p>To build the PowerShell module from source:</p>
+
+<h4>Prerequisites</h4>
+
+<ul>
+
+<li>Java JDK 8 or later</li>
+
+<li>Gradle 8.0+</li>
+
+<li>7-Zip (for .7z format)</li>
+
+<li>Git</li>
+
+</ul>
+
+<h4>Build Commands</h4>
+
+<pre class="highlight"><code class="highlighter-rouge"># Clone the repository
+git clone https://github.com/bearsampp/module-powershell.git
+cd module-powershell
+
+# Verify build environment
+gradle verify
+
+# Build a specific version
+gradle release -PbundleVersion=7.5.4
+
+# Build all available versions
+gradle releaseAll
+
+# List available versions
+gradle listVersions</code></pre>
+
+<h3 id="documentation">Documentation</h3>
+
+<ul>
+
+<li><a href="https://github.com/bearsampp/module-powershell/blob/main/README.md" target="_blank" rel="noopener">README.md</a> - Main documentation</li>
+
+<li><a href="https://github.com/bearsampp/module-powershell/blob/main/.gradle-docs/TASKS.md" target="_blank" rel="noopener">TASKS.md</a> - Complete task reference</li>
+
+<li><a href="https://github.com/bearsampp/module-powershell/blob/main/.gradle-docs/CONFIGURATION.md" target="_blank" rel="noopener">CONFIGURATION.md</a> - Configuration guide</li>
+
+<li><a href="https://github.com/bearsampp/module-powershell/blob/main/.gradle-docs/TROUBLESHOOTING.md" target="_blank" rel="noopener">TROUBLESHOOTING.md</a> - Troubleshooting guide</li>
+
+<li><a href="https://github.com/bearsampp/module-powershell/blob/main/docs/FAQ.html" target="_blank" rel="noopener">FAQ.html</a> - Frequently Asked Questions</li>
+
+</ul>
+
+{article title="Release icons legend"}{/article}<br>{fieldgroup 5}</div>
+
+<p><span><a target="_blank" href="https://github.com/bearsampp/module-powershell/releases" class="btn btn-default" rel="noopener" aria-label="View all releases"> View all releases </a></span></p>
