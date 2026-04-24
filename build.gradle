@@ -208,6 +208,9 @@ def downloadAndExtract(String url, File destDir) {
 
     // Extract the archive
     println "  Extracting to: ${destDir.absolutePath}"
+    if (destDir.exists()) {
+        delete destDir
+    }
     destDir.mkdirs()
 
     if (filename.endsWith('.zip')) {
@@ -440,12 +443,9 @@ tasks.register('release') {
             println "Cleaned: ${buildDir}"
         }
 
-        // Clean temp build directory
-        if (bundleTmpPath.exists()) {
-            delete bundleTmpPath
-            println "Cleaned: ${bundleTmpPath}"
-        }
-
+        // Do NOT clean the entire bundleTmpPath as it would delete other versions
+        // We will clean version-specific directories in doLast instead
+        
         println ""
         println "[SUCCESS] Build artifacts cleaned"
         println ""
@@ -453,6 +453,7 @@ tasks.register('release') {
 
     doLast {
         def versionToBuild = bundleVersionProperty
+        def detectedFontName = ""
 
         // Interactive mode if no version specified
         if (!versionToBuild) {
@@ -567,6 +568,25 @@ tasks.register('release') {
 
         // PowerShell binaries are never in bin/ - always download from modules-untouched
         println ""
+        println "=".multiply(70)
+        println "Cleaning existing temporary files for version ${bundleVersion}..."
+        println "=".multiply(70)
+        
+        def versionDirsToClean = [
+            file("${bundleTmpPrepPath}/${bundleName}${bundleVersion}"),
+            file("${bundleTmpBuildPath}/${bundleName}${bundleVersion}"),
+            file("${bundleTmpExtractPath}/${bundleVersion}"),
+            file("${buildTmpPath}/bundles_archive/${bundleType}/${bundleName}/${bundleName}${bundleVersion}")
+        ]
+        
+        versionDirsToClean.each { dir ->
+            if (dir.exists()) {
+                delete dir
+                println "  Removed: ${dir}"
+            }
+        }
+        println ""
+
         println "Downloading PowerShell ${bundleVersion}..."
         println ""
 
@@ -687,6 +707,116 @@ tasks.register('release') {
                 println "Verified: ${filename}"
             }
 
+            // Oh My Posh Font (Nerd Font)
+            if (depsProps.containsKey('oh_my_posh_font')) {
+                println ""
+                println "Download Oh My Posh Font"
+                def ohMyPoshFontUrl = depsProps.getProperty('oh_my_posh_font')
+                def ohMyPoshFontPath = file("${bundleSrcFinal}/vendor/fonts")
+
+                println "Check Oh My Posh Font"
+                ohMyPoshFontPath.mkdirs()
+
+                def downloadsDir = file(bundleTmpDownloadPath)
+                downloadsDir.mkdirs()
+                def fontFilename = ohMyPoshFontUrl.substring(ohMyPoshFontUrl.lastIndexOf('/') + 1)
+                def downloadedFontFile = file("${downloadsDir}/${fontFilename}")
+
+                downloadFile(ohMyPoshFontUrl, downloadedFontFile)
+
+                // Extract .ttf and .otf files from the zip into vendor/fonts/
+                def tempFontDir = file("${buildTmpPath}/font-temp")
+                if (tempFontDir.exists()) {
+                    delete tempFontDir
+                }
+                tempFontDir.mkdirs()
+
+                println "  Extracting font files..."
+                ant.unzip(src: downloadedFontFile, dest: tempFontDir, overwrite: true)
+
+                copy {
+                    from tempFontDir
+                    into ohMyPoshFontPath
+                    include '**/*.ttf'
+                    include '**/*.otf'
+                    includeEmptyDirs = false
+                }
+
+                def fontFiles = fileTree(ohMyPoshFontPath) {
+                    include '*.ttf'
+                    include '*.otf'
+                }.files
+                if (fontFiles.isEmpty()) {
+                    throw new GradleException("No .ttf or .otf files found after font extraction")
+                }
+                println "Verified: ${fontFiles.size()} font file(s)"
+
+                // Extract font family name from deps.properties
+                def fontMetadataName = depsProps.getProperty('oh_my_posh_font_name')?.replace('"', '')?.trim()
+                
+                if (!fontMetadataName) {
+                    println "  Warning: oh_my_posh_font_name not found in deps.properties. Falling back to manual extraction logic..."
+                    // Keep a simplified extraction logic as fallback if needed, or just warn
+                    def firstFont = fontFiles.find { it.name.endsWith('.ttf') || it.name.endsWith('.otf') }
+                    if (firstFont) {
+                        try {
+                            println "  Attempting fallback extraction from ${firstFont.name}..."
+                            def psScriptFile = file("${ohMyPoshFontPath}/extract-font-name.ps1")
+                            psScriptFile.text = """
+                                \$ErrorActionPreference = 'Stop'
+                                [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+                                Add-Type -AssemblyName System.Drawing
+                                \$fc = New-Object System.Drawing.Text.PrivateFontCollection
+                                \$fontPath = '${ohMyPoshFontPath.absolutePath.replace('\\', '/')}'
+                                \$files = Get-ChildItem -Path \$fontPath -Include *.ttf, *.otf
+                                foreach (\$file in \$files) {
+                                    try {
+                                        \$fc.AddFontFile(\$file.FullName)
+                                    } catch {
+                                        Write-Warning ("Failed to add font: " + \$file.FullName)
+                                    }
+                                }
+                                if (\$fc.Families.Count -eq 0) {
+                                    Write-Error -Message ('No font families found in PrivateFontCollection for path: ' + \$fontPath)
+                                    exit 1
+                                }
+                                \$names = @(\$fc.Families | ForEach-Object { \$_.Name })
+                                \$detected = \$names | Where-Object { \$_ -match 'Mono|NFM' } | Select-Object -First 1
+                                \$fallback = \$names | Select-Object -First 1
+                                \$final = if (\$detected) { \$detected } else { \$fallback }
+                                if (\$final) {
+                                    Write-Output \$final
+                                } else {
+                                    Write-Error -Message ('No final font name could be determined from detected families')
+                                    exit 1
+                                }
+                            """.stripIndent().trim()
+
+                            def process = new ProcessBuilder('powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', psScriptFile.absolutePath)
+                                .redirectErrorStream(true)
+                                .start()
+                            fontMetadataName = process.inputStream.text.trim()
+                            int exitVal = process.waitFor()
+                            psScriptFile.delete()
+
+                            if (exitVal != 0 || !fontMetadataName) {
+                                println "  Warning: Fallback extraction failed. Output: ${fontMetadataName}"
+                                fontMetadataName = ""
+                            } else {
+                                if (fontMetadataName.contains('\n')) fontMetadataName = fontMetadataName.split('\n')[0].trim()
+                                println "  Extracted font family name: ${fontMetadataName}"
+                            }
+                        } catch (Exception e) {
+                            println "  Warning: Fallback extraction error: ${e.message}"
+                            fontMetadataName = ""
+                        }
+                    }
+                } else {
+                    println "  Using font name from deps.properties: ${fontMetadataName}"
+                }
+                detectedFontName = fontMetadataName
+            }
+
             // GnuWin32 CoreUtils bin
             if (depsProps.containsKey('gnuwin32_coreutils_bin')) {
                 println ""
@@ -795,27 +925,63 @@ tasks.register('release') {
         println ""
         println "Preparing archive..."
 
-        // Prepare output directory (standard Bruno approach)
-        if (bundleTmpPrepPath.exists()) {
-            delete bundleTmpPrepPath
+        // Use a version-specific prep directory to avoid deleting other versions
+        def versionSpecificPrepPath = file("${bundleTmpPrepPath}/${bundleName}${bundleVersion}")
+        if (versionSpecificPrepPath.exists()) {
+            delete versionSpecificPrepPath
         }
-        bundleTmpPrepPath.mkdirs()
+        versionSpecificPrepPath.mkdirs()
 
         // Copy all files to prep directory
         copy {
             from bundleSrcFinal
-            into bundleTmpPrepPath
+            into versionSpecificPrepPath
         }
 
         // Copy bundle files again (overwrite)
         copy {
             from bundlePath
-            into bundleTmpPrepPath
+            into versionSpecificPrepPath
             exclude 'deps.properties'
         }
 
+        // Update powershell.bat and other config files with detected font name if available
+        if (detectedFontName) {
+            def filesToUpdate = [
+                file("${versionSpecificPrepPath}/powershell.bat"),
+                file("${versionSpecificPrepPath}/bearsampp.conf"),
+                file("${bundlePath}/powershell.bat"), // Update source file
+                file("${bundlePath}/bearsampp.conf")  // Update source file
+            ]
+            
+            filesToUpdate.each { cfgFile ->
+                if (cfgFile.exists()) {
+                    println "Updating ${cfgFile.absolutePath} with detected font name: ${detectedFontName}"
+                    def content = cfgFile.text
+                    
+                    if (cfgFile.name == 'powershell.bat') {
+                        // Use regex to replace the FONT_NAME assignment
+                        def pattern = /set\s+"FONT_NAME=[^"]*"/
+                        def replacement = "set \"FONT_NAME=${detectedFontName}\""
+                        if (content =~ pattern) {
+                            content = content.replaceFirst(pattern, replacement)
+                            cfgFile.text = content
+                        }
+                    } else if (cfgFile.name == 'bearsampp.conf') {
+                        // Update powershellFont in .conf
+                        def pattern = /powershellFont\s*=\s*"[^"]*"/
+                        def replacement = "powershellFont = \"${detectedFontName}\""
+                        if (content =~ pattern) {
+                            content = content.replaceFirst(pattern, replacement)
+                            cfgFile.text = content
+                        }
+                    }
+                }
+            }
+        }
+
         // Create VERSION file in prep directory (for archive)
-        def versionFilePrep = file("${bundleTmpPrepPath}/${bundleName}VERSION")
+        def versionFilePrep = file("${versionSpecificPrepPath}/${bundleName}VERSION")
         versionFilePrep.text = bundleVersion
         println "Created VERSION file for archive: ${versionFilePrep.name}"
 
@@ -840,6 +1006,35 @@ tasks.register('release') {
             from bundlePath
             into powershellBuildPath
             exclude 'deps.properties'
+        }
+
+        // Update powershell.bat in build directory with detected font name if available
+        if (detectedFontName) {
+            def buildFilesToUpdate = [
+                file("${powershellBuildPath}/powershell.bat"),
+                file("${powershellBuildPath}/bearsampp.conf")
+            ]
+            buildFilesToUpdate.each { cfgFile ->
+                if (cfgFile.exists()) {
+                    println "Updating ${cfgFile.absolutePath} in build directory with detected font name: ${detectedFontName}"
+                    def content = cfgFile.text
+                    if (cfgFile.name == 'powershell.bat') {
+                        def pattern = /set\s+"FONT_NAME=[^"]*"/
+                        def replacement = "set \"FONT_NAME=${detectedFontName}\""
+                        if (content =~ pattern) {
+                            content = content.replaceFirst(pattern, replacement)
+                            cfgFile.text = content
+                        }
+                    } else if (cfgFile.name == 'bearsampp.conf') {
+                        def pattern = /powershellFont\s*=\s*"[^"]*"/
+                        def replacement = "powershellFont = \"${detectedFontName}\""
+                        if (content =~ pattern) {
+                            content = content.replaceFirst(pattern, replacement)
+                            cfgFile.text = content
+                        }
+                    }
+                }
+            }
         }
         
         println "Non-zip version available at: ${powershellBuildPath}"

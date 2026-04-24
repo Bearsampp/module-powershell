@@ -21,7 +21,7 @@ This module provides automated building and packaging for Bearsampp.
 This PowerShell module requires a **Nerd Font** to display Oh My Posh icons and glyphs correctly.
 
 #### Required Font
-- **Font Name**: CaskaydiaCove NF (Cascadia Code Nerd Font)
+- **Font Name**: Cascadia Mono NF
 - **Installation**: Should be installed system-wide via Bearsampp prerequisites
 
 The font is automatically configured when using PowerShell within the Bearsampp environment.
@@ -213,7 +213,7 @@ C:/Bearsampp-build/
   - Configures PSReadLine (command-line editing)
   - Initializes Oh My Posh with paradox theme
   - Sets up history and key bindings
-  - Requires CaskaydiaCove NF font for proper icon display
+  - Requires Cascadia Mono NF font for proper icon display
 
 ### Environment Variables
 

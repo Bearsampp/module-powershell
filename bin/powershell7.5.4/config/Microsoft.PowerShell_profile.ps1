@@ -11,13 +11,13 @@ $env:POSH_ROOT = Join-Path $SHELL_ROOT "vendor\oh-my-posh"
 # Set PowerShell module path to include bundled modules
 $env:PSModulePath = (Join-Path $SHELL_ROOT "vendor\modules") + ";" + $env:PSModulePath
 
-# Configure console to use Nerd Font (CaskaydiaCove NF)
+# Configure console to use Nerd Font (Cascadia Mono NF)
 # This is required for Oh My Posh icons and glyphs to display correctly
 try {
     # Attempt to set console font programmatically
     $setFontScript = Join-Path $PSScriptRoot "Set-ConsoleFont.ps1"
     if (Test-Path $setFontScript) {
-        & $setFontScript -FontName "CaskaydiaCove NF" -FontSize 16 -ErrorAction SilentlyContinue
+        & $setFontScript -FontName "Cascadia Mono NF" -FontSize 16 -ErrorAction SilentlyContinue
     }
 
     # Only set default title if one hasn't been set already
@@ -46,11 +46,7 @@ if (Test-Path $ohMyPoshExe) {
     if (Test-Path $ohMyPoshTheme) {
         # Initialize Oh My Posh with the paradox theme
         & $ohMyPoshExe init pwsh --config $ohMyPoshTheme | Invoke-Expression
-    } else {
-        Write-Host "Oh My Posh theme not found: $ohMyPoshTheme" -ForegroundColor Yellow
     }
-} else {
-    Write-Host "Oh My Posh not found: $ohMyPoshExe" -ForegroundColor Yellow
 }
 
 # Import Terminal-Icons for colorful file/folder icons
@@ -62,7 +58,7 @@ try {
 
 # Set PowerShell options for better experience
 Set-PSReadLineOption -EditMode Windows
-Set-PSReadLineOption -PredictionSource History
+try { Set-PSReadLineOption -PredictionSource History } catch {}
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadLineOption -Colors @{
     Command   = 'Green'
@@ -80,6 +76,9 @@ Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Welcome message
-Write-Host "Bearsampp PowerShell" -ForegroundColor Cyan
-Write-Host "Enhanced with PSReadLine, Oh My Posh, and Terminal-Icons" -ForegroundColor Gray
-Write-Host ""
+# Only show banner in interactive ConsoleHost and not when running commands
+if ($Host.Name -eq "ConsoleHost" -and $ExecutionContext.SessionState.LanguageMode -eq "FullLanguage" -and -not $MyInvocation.BoundParameters.ContainsKey('Command')) {
+    Write-Host "Bearsampp PowerShell" -ForegroundColor Cyan
+    Write-Host "Enhanced with PSReadLine, Oh My Posh, and Terminal-Icons" -ForegroundColor Gray
+    Write-Host ""
+}
