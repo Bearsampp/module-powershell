@@ -1077,7 +1077,7 @@ tasks.register('release') {
             // Copy prep contents into versioned directory
             def versionedDir = file("${archiveStagingPath}/${bundleName}${bundleVersion}")
             copy {
-                from bundleTmpPrepPath
+                from versionSpecificPrepPath
                 into versionedDir
             }
 
@@ -1131,7 +1131,7 @@ tasks.register('release') {
             // Copy prep contents into versioned directory
             def versionedDir = file("${archiveStagingPath}/${bundleName}${bundleVersion}")
             copy {
-                from bundleTmpPrepPath
+                from versionSpecificPrepPath
                 into versionedDir
             }
 
