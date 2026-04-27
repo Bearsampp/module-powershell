@@ -13,67 +13,35 @@ $env:PSModulePath = (Join-Path $SHELL_ROOT "vendor\modules") + ";" + $env:PSModu
 
 # Configure console to use Nerd Font (Cascadia Mono NF)
 # This is required for Oh My Posh icons and glyphs to display correctly
-try {
-    # Attempt to set console font programmatically
-    $setFontScript = Join-Path $PSScriptRoot "Set-ConsoleFont.ps1"
-    if (Test-Path $setFontScript) {
-        & $setFontScript -FontName "Cascadia Mono NF" -FontSize 16 -ErrorAction SilentlyContinue
-    }
-
-    # Only set default title if one hasn't been set already
-    # This allows the launcher to set custom titles per console type
-    if ($Host.UI.RawUI.WindowTitle -eq "Administrator: C:\WINDOWS\system32\cmd.exe" -or
-        $Host.UI.RawUI.WindowTitle -eq "C:\WINDOWS\system32\cmd.exe" -or
-        $Host.UI.RawUI.WindowTitle -match "pwsh\.exe") {
-        $Host.UI.RawUI.WindowTitle = "Bearsampp PowerShell Console"
-    }
-
-    # Note: Font configuration is typically set in Windows Terminal settings.json
-    # or via registry for Windows Console Host. The font should be installed system-wide.
-    # Oh My Posh will automatically use the console's configured font.
-
-    # Set POSH_THEMES_PATH for easy theme switching
-    $env:POSH_THEMES_PATH = Join-Path $env:POSH_ROOT "themes"
-} catch {
-    # Silently continue if console configuration fails
-}
+# Note: Font configuration is handled by the launcher (powershell.bat) via registry.
 
 # Initialize Oh My Posh with theme
-$ohMyPoshExe = Join-Path $env:POSH_ROOT "posh-windows-amd64.exe"
-$ohMyPoshTheme = Join-Path $env:POSH_ROOT "themes\paradox.omp.json"
+$ohMyPoshExe = "$env:POSH_ROOT\posh-windows-amd64.exe"
+$ohMyPoshTheme = "$env:POSH_ROOT\themes\paradox.omp.json"
 
-if (Test-Path $ohMyPoshExe) {
-    if (Test-Path $ohMyPoshTheme) {
-        # Initialize Oh My Posh with the paradox theme
-        & $ohMyPoshExe init pwsh --config $ohMyPoshTheme | Invoke-Expression
-    }
+if (Test-Path $ohMyPoshExe -PathType Leaf) {
+    & $ohMyPoshExe init pwsh --config $ohMyPoshTheme | Invoke-Expression
 }
 
 # Import Terminal-Icons for colorful file/folder icons
-try {
-    Import-Module Terminal-Icons -ErrorAction SilentlyContinue
-} catch {
-    # Silently continue if Terminal-Icons is not available
-}
+Import-Module Terminal-Icons -ErrorAction SilentlyContinue
 
 # Set PowerShell options for better experience
-Set-PSReadLineOption -EditMode Windows
-try { Set-PSReadLineOption -PredictionSource History } catch {}
-Set-PSReadLineOption -HistorySearchCursorMovesToEnd
-Set-PSReadLineOption -Colors @{
-    Command   = 'Green'
-    Parameter = 'Gray'
-    String    = 'DarkCyan'
+if ($PSVersionTable.PSVersion.Major -ge 5) {
+    # Use a single call to Set-PSReadLineOption for speed if possible (not all options can be combined)
+    Set-PSReadLineOption -EditMode Windows -HistorySearchCursorMovesToEnd -MaximumHistoryCount 10000 -HistoryNoDuplicates
+    Set-PSReadLineOption -PredictionSource History -ErrorAction SilentlyContinue
+    Set-PSReadLineOption -Colors @{
+        Command   = 'Green'
+        Parameter = 'Gray'
+        String    = 'DarkCyan'
+    }
+
+    # Key bindings
+    Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+    Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
-
-# Set history options
-Set-PSReadLineOption -MaximumHistoryCount 10000
-Set-PSReadLineOption -HistoryNoDuplicates
-
-# Key bindings for better navigation
-Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
-Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
-Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Welcome message
 # Only show banner in interactive ConsoleHost and not when running commands
@@ -82,3 +50,4 @@ if ($Host.Name -eq "ConsoleHost" -and $ExecutionContext.SessionState.LanguageMod
     Write-Host "Enhanced with PSReadLine, Oh My Posh, and Terminal-Icons" -ForegroundColor Gray
     Write-Host ""
 }
+
