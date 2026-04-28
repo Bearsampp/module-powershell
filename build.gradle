@@ -708,38 +708,47 @@ tasks.register('release') {
             }
 
             // Oh My Posh Font (Nerd Font)
-            if (depsProps.containsKey('oh_my_posh_font')) {
+            if (depsProps.containsKey('oh_my_posh_font') || file("${bundlePath}/vendor/fonts").exists()) {
                 println ""
-                println "Download Oh My Posh Font"
-                def ohMyPoshFontUrl = depsProps.getProperty('oh_my_posh_font')
+                println "Process Oh My Posh Font"
                 def ohMyPoshFontPath = file("${bundleSrcFinal}/vendor/fonts")
-
-                println "Check Oh My Posh Font"
                 ohMyPoshFontPath.mkdirs()
 
-                def downloadsDir = file(bundleTmpDownloadPath)
-                downloadsDir.mkdirs()
-                def fontFilename = ohMyPoshFontUrl.substring(ohMyPoshFontUrl.lastIndexOf('/') + 1)
-                def downloadedFontFile = file("${downloadsDir}/${fontFilename}")
+                if (depsProps.containsKey('oh_my_posh_font')) {
+                    println "  Download Oh My Posh Font"
+                    def ohMyPoshFontUrl = depsProps.getProperty('oh_my_posh_font')
+                    def downloadsDir = file(bundleTmpDownloadPath)
+                    downloadsDir.mkdirs()
+                    def fontFilename = ohMyPoshFontUrl.substring(ohMyPoshFontUrl.lastIndexOf('/') + 1)
+                    def downloadedFontFile = file("${downloadsDir}/${fontFilename}")
 
-                downloadFile(ohMyPoshFontUrl, downloadedFontFile)
+                    downloadFile(ohMyPoshFontUrl, downloadedFontFile)
 
-                // Extract .ttf and .otf files from the zip into vendor/fonts/
-                def tempFontDir = file("${buildTmpPath}/font-temp")
-                if (tempFontDir.exists()) {
-                    delete tempFontDir
-                }
-                tempFontDir.mkdirs()
+                    // Extract .ttf and .otf files from the zip into vendor/fonts/
+                    def tempFontDir = file("${buildTmpPath}/font-temp")
+                    if (tempFontDir.exists()) {
+                        delete tempFontDir
+                    }
+                    tempFontDir.mkdirs()
 
-                println "  Extracting font files..."
-                ant.unzip(src: downloadedFontFile, dest: tempFontDir, overwrite: true)
+                    println "  Extracting font files..."
+                    ant.unzip(src: downloadedFontFile, dest: tempFontDir, overwrite: true)
 
-                copy {
-                    from tempFontDir
-                    into ohMyPoshFontPath
-                    include '**/*.ttf'
-                    include '**/*.otf'
-                    includeEmptyDirs = false
+                    copy {
+                        from tempFontDir
+                        into ohMyPoshFontPath
+                        include '**/*.ttf'
+                        include '**/*.otf'
+                        includeEmptyDirs = false
+                    }
+                } else if (file("${bundlePath}/vendor/fonts").exists()) {
+                    println "  Using bundled font from ${bundlePath}/vendor/fonts"
+                    copy {
+                        from "${bundlePath}/vendor/fonts"
+                        into ohMyPoshFontPath
+                        include '*.ttf'
+                        include '*.otf'
+                    }
                 }
 
                 def fontFiles = fileTree(ohMyPoshFontPath) {
@@ -747,7 +756,7 @@ tasks.register('release') {
                     include '*.otf'
                 }.files
                 if (fontFiles.isEmpty()) {
-                    throw new GradleException("No .ttf or .otf files found after font extraction")
+                    throw new GradleException("No .ttf or .otf files found for font")
                 }
                 println "Verified: ${fontFiles.size()} font file(s)"
 
@@ -1077,7 +1086,7 @@ tasks.register('release') {
             // Copy prep contents into versioned directory
             def versionedDir = file("${archiveStagingPath}/${bundleName}${bundleVersion}")
             copy {
-                from bundleTmpPrepPath
+                from versionSpecificPrepPath
                 into versionedDir
             }
 
@@ -1131,7 +1140,7 @@ tasks.register('release') {
             // Copy prep contents into versioned directory
             def versionedDir = file("${archiveStagingPath}/${bundleName}${bundleVersion}")
             copy {
-                from bundleTmpPrepPath
+                from versionSpecificPrepPath
                 into versionedDir
             }
 

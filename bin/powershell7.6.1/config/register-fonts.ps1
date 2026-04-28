@@ -135,4 +135,3 @@ public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wPa
 } else {
     Write-Error "Fonts source path does not exist: $fontsSrc"
 }
-

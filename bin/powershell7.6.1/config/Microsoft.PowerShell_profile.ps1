@@ -50,4 +50,3 @@ if ($Host.Name -eq "ConsoleHost" -and $ExecutionContext.SessionState.LanguageMod
     Write-Host "Enhanced with PSReadLine, Oh My Posh, and Terminal-Icons" -ForegroundColor Gray
     Write-Host ""
 }
-
