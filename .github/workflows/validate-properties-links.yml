@@ -12,18 +12,20 @@ on:
 
 jobs:
   validate-links:
+    name: validate-links
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
       
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       
       - name: Install dependencies
         run: |
@@ -33,8 +35,16 @@ jobs:
         id: changed_files
         run: |
           # Get list of changed .properties files
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep '\.properties$' || true)
+          # Using git diff with base and head SHAs is the most reliable way in PRs
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          
+          echo "Comparing $BASE_SHA to $HEAD_SHA"
+          
+          # Fetch enough history to find the common ancestor
+          git fetch origin $BASE_SHA --depth=1 || git fetch origin $BASE_SHA
+          
+          CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep '\.properties$' || true)
           
           if [ -z "$CHANGED_FILES" ]; then
             echo "No properties files changed"
@@ -210,7 +220,7 @@ jobs:
       
       - name: Comment on PR with validation results
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -235,7 +245,7 @@ jobs:
       
       - name: Comment on PR with success
         if: success() && steps.changed_files.outputs.files != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
