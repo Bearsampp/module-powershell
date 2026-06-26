@@ -178,10 +178,10 @@ REM Launch PowerShell with custom profile and parameters
 REM We use cmd /c start to launch in a new process which reliably picks up registry font settings
 REM then we exit the current (incorrectly fonted) window.
 if "%NO_EXIT%"=="1" (
-    start "!WINDOW_TITLE!" "!PS_EXE!" -NoExit -NoProfile -Command "!PS_COMMAND!"
+    start "!WINDOW_TITLE!" "!PS_EXE!" -NoExit -NoProfile -ExecutionPolicy Bypass -Command "!PS_COMMAND!"
     exit
 ) else (
-    start "!WINDOW_TITLE!" "!PS_EXE!" -NoProfile -Command "!PS_COMMAND!; exit"
+    start "!WINDOW_TITLE!" "!PS_EXE!" -NoProfile -ExecutionPolicy Bypass -Command "!PS_COMMAND!; exit"
     exit
 )
 popd
