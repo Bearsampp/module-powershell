@@ -100,19 +100,19 @@ set "PS_START_DIR=!START_DIR:'=''!"
 set "PS_CUSTOM_PROFILE=!CUSTOM_PROFILE:'=''!"
 
 REM Configure console font via registry BEFORE launching PowerShell
-REM This ensures ALL console windows use !FONT_NAME! font with proper UTF-8 support
+REM This ensures the launched window uses !FONT_NAME! font with proper UTF-8 support
 
 if "!SKIP_FONT_CHECK!"=="1" goto skip_registry_config
 
 REM Set font for the specific window title being used
 if not "!WINDOW_TITLE!"=="" (
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v FaceName /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontFamily /t REG_DWORD /d 54 /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontSize /t REG_DWORD /d 0x00100000 /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontWeight /t REG_DWORD /d 400 /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v CodePage /t REG_DWORD /d 65001 /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v ScreenBufferSize /t REG_DWORD /d 0x0bb8006e /f >nul 2>&1
-    reg add "HKCU\Console\!WINDOW_TITLE!" /v WindowSize /t REG_DWORD /d 0x001e006e /f >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v FaceName /t REG_SZ /d "!FONT_NAME!" >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontFamily /t REG_DWORD /d 54 >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontSize /t REG_DWORD /d 0x00100000 >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v FontWeight /t REG_DWORD /d 400 >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v CodePage /t REG_DWORD /d 65001 >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v ScreenBufferSize /t REG_DWORD /d 0x0bb8006e >nul 2>&1
+    reg add "HKCU\Console\!WINDOW_TITLE!" /v WindowSize /t REG_DWORD /d 0x001e006e >nul 2>&1
 
 REM Force current window to use the font by setting title
     title !WINDOW_TITLE!
@@ -123,13 +123,6 @@ REM Force current window to use the font by setting title
     REM Optional: Briefly clear screen to force a redraw in some conhost versions
     cls
 )
-
-REM Set default console properties (applies to all new console windows)
-reg add "HKCU\Console" /v FaceName /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
-reg add "HKCU\Console" /v FontFamily /t REG_DWORD /d 54 /f >nul 2>&1
-reg add "HKCU\Console" /v FontSize /t REG_DWORD /d 0x00100000 /f >nul 2>&1
-reg add "HKCU\Console" /v FontWeight /t REG_DWORD /d 400 /f >nul 2>&1
-reg add "HKCU\Console" /v CodePage /t REG_DWORD /d 65001 /f >nul 2>&1
 
 REM Ensure the font is registered as a valid console font in HKCU and HKLM
 REM HKLM is often required for conhost.exe to recognize the font
@@ -142,15 +135,6 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont"
 reg add "HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v "0" /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v "00" /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v "000" /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
-
-REM Also explicitly set for common Bearsampp titles as a fallback
-for %%T in ("Bearsampp PowerShell Console" "MariaDB" "MySQL" "PostgreSQL" "Git" "Python" "Composer" "PEAR" "Perl" "Ruby" "Ghostscript" "ngrok" "Node.js" "Console") do (
-    reg add "HKCU\Console\%%~T" /v FaceName /t REG_SZ /d "!FONT_NAME!" /f >nul 2>&1
-    reg add "HKCU\Console\%%~T" /v FontFamily /t REG_DWORD /d 54 /f >nul 2>&1
-    reg add "HKCU\Console\%%~T" /v FontSize /t REG_DWORD /d 0x00100000 /f >nul 2>&1
-    reg add "HKCU\Console\%%~T" /v FontWeight /t REG_DWORD /d 400 /f >nul 2>&1
-    reg add "HKCU\Console\%%~T" /v CodePage /t REG_DWORD /d 65001 /f >nul 2>&1
-)
 
 REM Re-apply title
 title !WINDOW_TITLE!
