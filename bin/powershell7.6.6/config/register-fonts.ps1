@@ -57,9 +57,16 @@ if (Test-Path $fontsSrc) {
         New-Item -Path "HKCU:\Software\Microsoft\Windows NT\CurrentVersion" -Name "Fonts" -Force | Out-Null
     }
 
-    $fontFiles | ForEach-Object {
-        $fontFile = $_.FullName
-        $destFile = Join-Path $fontsDest $_.Name
+    $signature = @'
+[DllImport("gdi32.dll", CharSet = CharSet.Auto)]
+public static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr res);
+'@
+    $gdi32 = Add-Type -MemberDefinition $signature -Name "Gdi32" -Namespace "Win32" -PassThru
+
+    $installFailed = $false
+    foreach ($fontItem in $fontFiles) {
+        $fontFile = $fontItem.FullName
+        $destFile = Join-Path $fontsDest $fontItem.Name
         
         $fileFc = New-Object System.Drawing.Text.PrivateFontCollection
         try {
@@ -84,28 +91,30 @@ if (Test-Path $fontsSrc) {
                 }
             }
 
-            if ($null -eq $currentRegValue -or ($currentRegValue -ne $destFile -and $currentRegValue -ne $_.Name)) {
+            if ($null -eq $currentRegValue -or ($currentRegValue -ne $destFile -and $currentRegValue -ne $fontItem.Name)) {
                 $needsInstall = $true
             }
 
             if ($needsInstall) {
                 try {
-                    Copy-Item $fontFile $destFile -Force
-                    Set-ItemProperty -Path $regPath -Name $regValueName -Value $destFile -Force
-                    
-                    $signature = @'
-[DllImport("gdi32.dll", CharSet = CharSet.Auto)]
-public static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr res);
-'@
-                    $gdi32 = Add-Type -MemberDefinition $signature -Name "Gdi32" -Namespace "Win32" -PassThru
-                    $gdi32::AddFontResourceEx($destFile, 0, [IntPtr]::Zero) | Out-Null
+                    Copy-Item -LiteralPath $fontFile -Destination $destFile -Force -ErrorAction Stop
+                    Set-ItemProperty -Path $regPath -Name $regValueName -Value $destFile -Force -ErrorAction Stop
+                    if ($gdi32::AddFontResourceEx($destFile, 0, [IntPtr]::Zero) -eq 0) {
+                        throw "AddFontResourceEx failed for font $internalName"
+                    }
                 } catch {
-                    Write-Error "Failed to install font $internalName"
+                    $installFailed = $true
+                    Write-Error "Failed to install font ${internalName}: $($_.Exception.Message)"
                 }
             }
         }
     }
     
+    if ($installFailed) {
+        Write-Error "Font installation failed; keeping fallback font"
+        exit 1
+    }
+
     $finalName = if ($detectedName) { $detectedName } else { $fallbackName }
     if ($finalName) {
         # Ensure the font is also registered in Console\TrueTypeFont
@@ -113,7 +122,12 @@ public static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr 
         if (-not (Test-Path $trueTypeFontKey)) {
             New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console" -Name "TrueTypeFont" -Force | Out-Null
         }
-        Set-ItemProperty -Path $trueTypeFontKey -Name "00" -Value $finalName -Force
+        try {
+            Set-ItemProperty -Path $trueTypeFontKey -Name "00" -Value $finalName -Force -ErrorAction Stop
+        } catch {
+            Write-Error "Failed to register TrueType font ${finalName}: $($_.Exception.Message)"
+            exit 1
+        }
 
         $signature = @'
 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -131,6 +145,7 @@ public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wPa
         Write-Output $finalName
     } else {
         Write-Warning "No valid fonts detected in $fontsSrc"
+        exit 1
     }
 } else {
     Write-Error "Fonts source path does not exist: $fontsSrc"
