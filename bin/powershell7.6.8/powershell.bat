@@ -29,9 +29,6 @@ set "START_DIR=%CD%"
 set "NO_EXIT=1"
 set "FONT_NAME=CaskaydiaMono NF"
 
-REM Check if we are running in a specialized console that doesn't need re-config
-if defined BEARSAMPP_SHELL goto skip_registry_config
-
 REM Check if a valid font is already configured in the registry to save time
 reg query "HKCU\Console" /v FaceName >nul 2>&1
 if not errorlevel 1 (
@@ -85,7 +82,12 @@ set "REGISTER_FONTS_PS1=%SHELL_ROOT%\config\register-fonts.ps1"
 
 REM Fast font discovery and registration
 REM This script outputs the FONT_NAME to be used
-set "POWERSHELL_SCRIPT=$fontName = '%FONT_NAME%'; if (-not (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -Name '*%FONT_NAME%*' -ErrorAction SilentlyContinue)) { $fallbacks = @('CaskaydiaMono NF', 'CaskaydiaCove NF', 'JetBrainsMono NF', 'MesloLGS NF', 'Cascadia Mono NF'); foreach ($f in $fallbacks) { if (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -Name '*$f*' -ErrorAction SilentlyContinue) { $fontName = $f; break } } }; if ('%FONTS_SRC%' -ne '' -and (Test-Path '%REGISTER_FONTS_PS1%')) { $captured = & '%PS_EXE%' -NoProfile -ExecutionPolicy Bypass -File '%REGISTER_FONTS_PS1%' '%FONTS_SRC%' '%FONTS_DEST%'; if ($LASTEXITCODE -eq 0 -and $captured -and $captured -notmatch 'WARNING:|ERROR:') { $fontName = $captured } }; $fontName"
+set "POWERSHELL_SCRIPT=$fontName = $env:FONT_NAME; if (-not (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -Name ('*' + $fontName + '*') -ErrorAction SilentlyContinue)) { $fallbacks = @('CaskaydiaMono NF', 'CaskaydiaCove NF', 'JetBrainsMono NF', 'MesloLGS NF', 'Cascadia Mono NF'); foreach ($f in $fallbacks) { if (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -Name ('*' + $f + '*') -ErrorAction SilentlyContinue) { $fontName = $f; break } } }; $fontsSrc = $env:FONTS_SRC; $registerFontsPs1 = $env:REGISTER_FONTS_PS1; $fontsDest = $env:FONTS_DEST; $psExe = $env:PS_EXE; if ($fontsSrc -ne '' -and (Test-Path $registerFontsPs1)) { $captured = & $psExe -NoProfile -ExecutionPolicy Bypass -File $registerFontsPs1 $fontsSrc $fontsDest; if ($LASTEXITCODE -eq 0 -and $captured) { $captured = $captured | Where-Object { $_ -notmatch 'WARNING:|ERROR:' } | Select-Object -Last 1; if ($captured) { $fontName = $captured } } }; $fontName"
+set "FONT_NAME=%FONT_NAME%"
+set "FONTS_SRC=%FONTS_SRC%"
+set "FONTS_DEST=%FONTS_DEST%"
+set "REGISTER_FONTS_PS1=%REGISTER_FONTS_PS1%"
+set "PS_EXE=%PS_EXE%"
 
 for /f "usebackq delims=" %%F in (`^""%PS_EXE%" -NoProfile -ExecutionPolicy Bypass -Command "%POWERSHELL_SCRIPT%"^"`) do (
     set "FONT_NAME=%%~F"
@@ -100,6 +102,7 @@ set "PS_CUSTOM_PROFILE=%CUSTOM_PROFILE:'=''%"
 
 REM Configure console font via registry BEFORE launching PowerShell
 REM This ensures the launched window uses %FONT_NAME% font with proper UTF-8 support
+if defined BEARSAMPP_SHELL goto skip_registry_config
 
 if "%SKIP_FONT_CHECK%"=="1" goto skip_registry_config
 
@@ -114,7 +117,12 @@ if not "%WINDOW_TITLE%"=="" (
     reg add "HKCU\Console\%WINDOW_TITLE%" /v WindowSize /t REG_DWORD /d 0x001e006e >nul 2>&1
 
 REM Force current window to use the font by setting title
-    title %WINDOW_TITLE%
+    set "TITLE_SAFE=%WINDOW_TITLE:&=^&%"
+    set "TITLE_SAFE=%TITLE_SAFE:|=^|%"
+    set "TITLE_SAFE=%TITLE_SAFE:<=^<%"
+    set "TITLE_SAFE=%TITLE_SAFE:>=^>%"
+    set "TITLE_SAFE=%TITLE_SAFE:^=^^%"
+    title %TITLE_SAFE%
 
     REM Extra "kick" to force conhost to update
     powershell -NoProfile -Command "$Host.UI.RawUI.WindowTitle='Refreshing...'; $Host.UI.RawUI.WindowTitle='%PS_WINDOW_TITLE%'" >nul 2>&1
@@ -135,7 +143,12 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont"
 reg add "HKCU\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v "000" /t REG_SZ /d "%FONT_NAME%" /f >nul 2>&1
 
 REM Re-apply title
-title %WINDOW_TITLE%
+set "TITLE_SAFE=%WINDOW_TITLE:&=^&%"
+set "TITLE_SAFE=%TITLE_SAFE:|=^|%"
+set "TITLE_SAFE=%TITLE_SAFE:<=^<%"
+set "TITLE_SAFE=%TITLE_SAFE:>=^>%"
+set "TITLE_SAFE=%TITLE_SAFE:^=^^%"
+title %TITLE_SAFE%
 
 :skip_registry_config
 
@@ -143,7 +156,12 @@ REM Set UTF-8 code page for current console
 chcp 65001 >nul 2>&1
 
 REM Ensure the final window title is set
-title %WINDOW_TITLE%
+set "TITLE_SAFE=%WINDOW_TITLE:&=^&%"
+set "TITLE_SAFE=%TITLE_SAFE:|=^|%"
+set "TITLE_SAFE=%TITLE_SAFE:<=^<%"
+set "TITLE_SAFE=%TITLE_SAFE:>=^>%"
+set "TITLE_SAFE=%TITLE_SAFE:^=^^%"
+title %TITLE_SAFE%
 
 REM Set marker to skip re-config in sub-shells
 set "BEARSAMPP_SHELL=1"
@@ -154,7 +172,12 @@ REM This forces conhost.exe to re-read registry settings for the target title
 set "PS_COMMAND=[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::InputEncoding = [System.Text.Encoding]::UTF8; $Host.UI.RawUI.WindowTitle='Refreshing...'; $Host.UI.RawUI.WindowTitle='%PS_WINDOW_TITLE%'; Set-Location -LiteralPath '%PS_START_DIR%'; . '%PS_CUSTOM_PROFILE%'"
 
 REM Extra attempt to force font refresh in some conhost versions
-title %WINDOW_TITLE%
+set "TITLE_SAFE=%WINDOW_TITLE:&=^&%"
+set "TITLE_SAFE=%TITLE_SAFE:|=^|%"
+set "TITLE_SAFE=%TITLE_SAFE:<=^<%"
+set "TITLE_SAFE=%TITLE_SAFE:>=^>%"
+set "TITLE_SAFE=%TITLE_SAFE:^=^^%"
+title %TITLE_SAFE%
 
 REM Launch PowerShell with custom profile and parameters
 REM We use cmd /c start to launch in a new process which reliably picks up registry font settings

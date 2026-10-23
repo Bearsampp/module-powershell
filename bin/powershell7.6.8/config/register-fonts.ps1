@@ -96,13 +96,23 @@ public static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr 
             }
 
             if ($needsInstall) {
+                $copiedFile = $false
+                $regSet = $false
                 try {
                     Copy-Item -LiteralPath $fontFile -Destination $destFile -Force -ErrorAction Stop
+                    $copiedFile = $true
                     Set-ItemProperty -Path $regPath -Name $regValueName -Value $destFile -Force -ErrorAction Stop
+                    $regSet = $true
                     if ($gdi32::AddFontResourceEx($destFile, 0, [IntPtr]::Zero) -eq 0) {
                         throw "AddFontResourceEx failed for font $internalName"
                     }
                 } catch {
+                    if ($copiedFile -and (Test-Path $destFile)) {
+                        try { Remove-Item -LiteralPath $destFile -Force -ErrorAction SilentlyContinue } catch {}
+                    }
+                    if ($regSet) {
+                        try { Remove-ItemProperty -Path $regPath -Name $regValueName -ErrorAction SilentlyContinue } catch {}
+                    }
                     $installFailed = $true
                     Write-Error "Failed to install font ${internalName}: $($_.Exception.Message)"
                 }
