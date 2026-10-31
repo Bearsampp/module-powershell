@@ -19,7 +19,7 @@
   </defs>
   <rect class="bg" x="0" y="0" width="1000" height="360" rx="16" />
   <text class="title" x="64" y="34">Bearsampp/module-powershell release downloads</text>
-  <text class="sub" x="64" y="352">Generated 2026-10-30</text>
+  <text class="sub" x="64" y="352">Generated 2026-10-31</text>
   <line x1="64" y1="52.00" x2="976" y2="52.00" class="grid"/>
   <text x="56" y="56.00" text-anchor="end" class="axis">202</text>
   <line x1="64" y1="94.00" x2="976" y2="94.00" class="grid"/>
@@ -34,16 +34,16 @@
   <text x="56" y="266.00" text-anchor="end" class="axis">34</text>
   <line x1="64" y1="304.00" x2="976" y2="304.00" class="grid"/>
   <text x="56" y="308.00" text-anchor="end" class="axis">0</text>
-  <path d="M 64.00 304 L 64.00 304.00 L 105.45 302.75 L 146.91 302.75 L 188.36 302.75 L 229.82 301.50 L 271.27 300.26 L 312.73 289.03 L 354.18 285.29 L 395.64 285.29 L 437.09 285.29 L 478.55 284.04 L 520.00 285.29 L 561.45 285.29 L 602.91 221.66 L 644.36 226.65 L 685.82 226.65 L 727.27 176.75 L 768.73 176.75 L 810.18 95.66 L 851.64 56.99 L 893.09 131.84 L 934.55 52.00 L 976.00 52.00 L 976.00 304 Z" fill="url(#fill-weekly-black)"/>
-  <polyline class="line" points="64.00,304.00 105.45,302.75 146.91,302.75 188.36,302.75 229.82,301.50 271.27,300.26 312.73,289.03 354.18,285.29 395.64,285.29 437.09,285.29 478.55,284.04 520.00,285.29 561.45,285.29 602.91,221.66 644.36,226.65 685.82,226.65 727.27,176.75 768.73,176.75 810.18,95.66 851.64,56.99 893.09,131.84 934.55,52.00 976.00,52.00"/>
-  <circle class="dot" cx="976.00" cy="52.00" r="4.5"/>
+  <path d="M 64.00 304 L 64.00 304.00 L 103.65 302.75 L 143.30 302.75 L 182.96 302.75 L 222.61 301.50 L 262.26 300.26 L 301.91 289.03 L 341.57 285.29 L 381.22 285.29 L 420.87 285.29 L 460.52 284.04 L 500.17 285.29 L 539.83 285.29 L 579.48 221.66 L 619.13 226.65 L 658.78 226.65 L 698.43 176.75 L 738.09 176.75 L 777.74 95.66 L 817.39 56.99 L 857.04 131.84 L 896.70 52.00 L 936.35 52.00 L 976.00 66.97 L 976.00 304 Z" fill="url(#fill-weekly-black)"/>
+  <polyline class="line" points="64.00,304.00 103.65,302.75 143.30,302.75 182.96,302.75 222.61,301.50 262.26,300.26 301.91,289.03 341.57,285.29 381.22,285.29 420.87,285.29 460.52,284.04 500.17,285.29 539.83,285.29 579.48,221.66 619.13,226.65 658.78,226.65 698.43,176.75 738.09,176.75 777.74,95.66 817.39,56.99 857.04,131.84 896.70,52.00 936.35,52.00 976.00,66.97"/>
+  <circle class="dot" cx="976.00" cy="66.97" r="4.5"/>
   
   <text class="axis" x="64.00" y="336" text-anchor="start">2026-10-07</text>
-  <text class="axis" x="229.82" y="336" text-anchor="middle">2026-10-12</text>
-  <text class="axis" x="395.64" y="336" text-anchor="middle">2026-10-16</text>
-  <text class="axis" x="561.45" y="336" text-anchor="middle">2026-10-20</text>
-  <text class="axis" x="727.27" y="336" text-anchor="middle">2026-10-24</text>
-  <text class="axis" x="893.09" y="336" text-anchor="middle">2026-10-28</text>
-  <text class="axis" x="976.00" y="336" text-anchor="end">2026-10-30</text>
-  <text class="latest" x="976" y="34" text-anchor="end">Latest week: 202</text>
+  <text class="axis" x="222.61" y="336" text-anchor="middle">2026-10-12</text>
+  <text class="axis" x="381.22" y="336" text-anchor="middle">2026-10-16</text>
+  <text class="axis" x="539.83" y="336" text-anchor="middle">2026-10-20</text>
+  <text class="axis" x="698.43" y="336" text-anchor="middle">2026-10-24</text>
+  <text class="axis" x="857.04" y="336" text-anchor="middle">2026-10-28</text>
+  <text class="axis" x="976.00" y="336" text-anchor="end">2026-10-31</text>
+  <text class="latest" x="976" y="34" text-anchor="end">Latest week: 190</text>
 </svg>
